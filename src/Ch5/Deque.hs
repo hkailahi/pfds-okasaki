@@ -1,8 +1,10 @@
 module Ch5.Deque where
 
+import BasicPrelude
+
 import Data.List.NonEmpty (NonEmpty ((:|)), (<|))
 import qualified Data.List.NonEmpty as NE
-                          
+
 -- |EXERCISE 5.1
 
 -- |Exception value representing an empty deque.
@@ -88,37 +90,37 @@ instance Deque BatchedDeque where
   cons x (BDMore ys zs) = BDMore (x <| ys) zs
 
   -- O(1) worst case
-  head BDZero               = Left DequeEmpty
-  head (BDOne y)            = Right y
-  head (BDMore (y :| ys) _) = Right y
+  head BDZero              = Left DequeEmpty
+  head (BDOne y)           = Right y
+  head (BDMore (y :| _) _) = Right y
 
   -- O(n) worst case, but O(1) amortized, analysis below
   tail BDZero                       = Left DequeEmpty
-  tail (BDOne y)                    = Right BDZero
-  tail (BDMore (y :| (y':ys')) zs)  = Right $ BDMore (y' :| ys') zs
-  tail (BDMore (y :| []) (z :| zs)) = Right $
+  tail (BDOne _)                    = Right BDZero
+  tail (BDMore (_ :| (y':ys')) zs)  = Right $ BDMore (y' :| ys') zs
+  tail (BDMore (_ :| []) (z :| zs)) = Right $
     let (stillBack, nowFront) = reverseHalf zs
     in case NE.nonEmpty nowFront of
       -- if nowFront is empty, so is stillBack
       Nothing  -> BDOne z
       -- note that length stillBack <= length nowFront <= length stillBack + 1
       Just ys' -> BDMore ys' (z :| stillBack)
-  
+
   -- O(1) worst case
   snoc BDZero         x = BDOne x
   snoc (BDOne y)      x = BDMore (y :| []) (x :| [])
   snoc (BDMore ys zs) x = BDMore ys        (x <| zs)
 
   -- O(1) worst case
-  last BDZero               = Left DequeEmpty
-  last (BDOne y)            = Right y
-  last (BDMore _ (z :| zs)) = Right z
+  last BDZero              = Left DequeEmpty
+  last (BDOne y)           = Right y
+  last (BDMore _ (z :| _)) = Right z
 
   -- O(n) worst case, but O(1) amortized, analysis below
   init BDZero                       = Left DequeEmpty
-  init (BDOne y)                    = Right BDZero
-  init (BDMore ys (z :| (z':zs')))  = Right $ BDMore ys (z' :| zs')
-  init (BDMore (y :| ys) (z :| [])) = Right $
+  init (BDOne _)                    = Right BDZero
+  init (BDMore ys (_ :| (z':zs')))  = Right $ BDMore ys (z' :| zs')
+  init (BDMore (y :| ys) (_ :| [])) = Right $
     let (stillFront, nowBack) = reverseHalf ys
     in case NE.nonEmpty nowBack of
       -- if nowBack is empty, so is stillFront

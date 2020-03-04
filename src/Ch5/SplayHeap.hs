@@ -1,5 +1,7 @@
 module Ch5.SplayHeap where
 
+import BasicPrelude hiding (partition)
+
 -- |Exception value representing an empty heap.
 data HeapEmpty = HeapEmpty
   deriving (Eq, Show)
@@ -52,7 +54,7 @@ data Tree a =
 --  /  \               /  \
 -- 10  40             40  70
 bigger :: (Ord a) => a -> Tree a -> Tree a
-bigger pivot Leaf           = Leaf
+bigger _     Leaf           = Leaf
 bigger pivot t@(Node l x r)
   | x <= pivot = bigger pivot r
   | x > pivot  = case l of
@@ -60,11 +62,13 @@ bigger pivot t@(Node l x r)
       Node l' x' r'
         | x' <= pivot -> Node (bigger pivot r') x r  -- filter-the-right case
         | x' > pivot  -> Node (bigger pivot l') x' (Node r' x r)  -- rebalance case
+      _             -> error "Partial - Non-exhaustive pattern match"
+bigger _ _ = error "Partial - Non-exhaustive pattern match"
 
 -- |Same idea, opposite comparison. Equal signs move around because `smaller` should
 -- extract the subtree of elements <= pivot, not < pivot.
 smaller :: (Ord a) => a -> Tree a -> Tree a
-smaller pivot Leaf           = Leaf
+smaller _     Leaf           = Leaf
 smaller pivot t@(Node l x r)
   | x > pivot  = smaller pivot l
   | x <= pivot = case r of
@@ -72,12 +76,14 @@ smaller pivot t@(Node l x r)
       Node l' x' r'
         | x' > pivot  -> Node l x (smaller pivot l')  -- filter-the-left case
         | x' <= pivot -> Node (Node l x l') x' (smaller pivot r')  -- rebalance case
+      _             -> error "Partial - Non-exhaustive pattern match"
+smaller _ _ = error "Partial - Non-exhaustive pattern match"
 
 -- |Combine the effect of smaller and bigger into a single pass function.
 -- partition pivot t = (small, big) where small contains all the elements of t that are
 -- <= pivot and big contains all the elements of t that are > pivot.
 partition :: (Ord a) => a -> Tree a -> (Tree a, Tree a)
-partition pivot Leaf           = (Leaf, Leaf)
+partition _     Leaf           = (Leaf, Leaf)
 partition pivot t@(Node l x r)
   | x <= pivot = case r of
       Leaf          -> (t, Leaf)
@@ -86,6 +92,7 @@ partition pivot t@(Node l x r)
                          in (Node l x small, Node big x' r')
         | x' <= pivot -> let (small, big) = partition pivot r'  -- rebalance case
                          in (Node (Node l x l') x' small, big)
+      _             -> error "Partial - Non-exhaustive pattern match"
   | x > pivot  = case l of
       Leaf          -> (Leaf, t)
       Node l' x' r'
@@ -93,6 +100,9 @@ partition pivot t@(Node l x r)
                          in (Node l' x' small, Node big x r)
         | x' > pivot  -> let (small, big) = partition pivot l'  -- rebalance case
                          in (small, Node big x' (Node r' x r))
+      _             -> error "Partial - Non-exhaustive pattern match"
+partition _     _              = error "Partial - Non-exhaustive pattern match"
+
 
 instance (Ord a) => Heap Tree a where
 
@@ -121,7 +131,7 @@ instance (Ord a) => Heap Tree a where
 
   -- Amortized time O(log n), proof below
   deleteMin Leaf                       = Left HeapEmpty
-  deleteMin (Node Leaf            x r) = Right r
+  deleteMin (Node Leaf            _ r) = Right r
   deleteMin (Node (Node l' x' r') x r) = Right $ case deleteMin l' of
     Left _    -> Node r' x r  -- x' is the minimum element
     Right l'' -> Node l'' x' (Node r' x r)  -- rebalance case

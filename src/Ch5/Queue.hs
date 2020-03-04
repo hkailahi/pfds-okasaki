@@ -1,5 +1,7 @@
 module Ch5.Queue where
 
+import BasicPrelude
+
 import Data.List.NonEmpty (NonEmpty ((:|)))
 import qualified Data.List.NonEmpty as NE
 
@@ -18,7 +20,7 @@ import qualified Data.List.NonEmpty as NE
 -- sum(a_j : 1 <= j <= k) >= sum(t_j : 1 <= j <= k) for every 1 <= k <= n
 --
 -- * Physicist's method
--- 
+--
 -- The simplest way to prove such a bound ("physicist's method") is to construct a potential
 -- function V, which assigns a nonnegative value to each data structure. If an operation o
 -- transforms a structure S into a structure S', then V(S') - V(S), the potential change,
@@ -84,7 +86,7 @@ class Queue f where
 
   empty :: f a
   -- ^ An empty queue.
-  
+
   isEmpty :: f a -> Bool
   -- ^ True if the queue is empty, False otherwise.
 
@@ -129,8 +131,8 @@ instance Queue BatchedQueue where
 
   -- O(n) worst case since it calls reverse, but O(1) amortized, analysis follows.
   tail BQEmpty                        = Left QueueEmpty
-  tail (BQNonEmpty (x :| (x':xs')) r) = Right $ BQNonEmpty (x' :| xs') r
-  tail (BQNonEmpty (x :| []) r)       = Right $ case NE.nonEmpty (reverse r) of
+  tail (BQNonEmpty (_ :| (x':xs')) r) = Right $ BQNonEmpty (x' :| xs') r
+  tail (BQNonEmpty (_ :| []) r)       = Right $ case NE.nonEmpty (reverse r) of
     Nothing -> BQEmpty
     Just r' -> BQNonEmpty r' []
 
