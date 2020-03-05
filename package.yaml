@@ -73,6 +73,7 @@ dependencies:
   - basic-prelude
   - bytestring
   - containers
+  - dlist
   - lens
   - text
   - unordered-containers
