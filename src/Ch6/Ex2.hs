@@ -17,7 +17,6 @@ import Ch6.Types.BankersQueue
 -- 2. Compare the relative performance of the two implementations on a sequence of one hundred
 -- snocs followed by one hundred tails.
 
-
 ---------------------------------------------------------------------------------------------------
 
 newtype LessMovementBQ a = LessMovementBQ
@@ -70,28 +69,39 @@ examples = do
 
 {-
 1.)
-  Assign debt D(i) ≤ min(3i, 2*∣f∣ − |r|) to the ith element of the front
+  See https://stappit.github.io/posts/pfds/okasakiPFDSc06.html
+
+  Assume debt function:
+    - Assign `D(i) ≤ min(3i, 2 * ∣f∣ − |r|)` to the i-th element of the front
+
+  inv = 2 * ∣f∣ − |r|
+
+  - Non-rotation `snoc` operations
+    - Increases `r` by 1, thus decreasing `inv` by 2 (aka 2 * (-r))
+      - Can't insert when `D(i) = inv` without rotating (rebalancing/frontloading)
+        - So discharge debit built up
 
   Every `snoc` that doesn’t cause a rotation increases |r| by 1 and decreases 2∣f∣−|r| by 1. This
   violates the debt invariant by 1 whenever we just previously had D(i)=2∣∣f∣∣−|r|. We can restore
   the invariant by discharging the first debit in the queue, which decreases the rest by 1.
 
+  - Non-rotation `tail` operations
+    - Two changes
+      - Decrease `f` by 1, thus decreasing `inv` by 2 (aka -(2 * f))
+        - Can't insert when `D(i) = inv` without rotating (rebalancing/frontloading)
+          - So discharge debit built up
+      - Decreases the index (`i`) of the remaining nodes by 1, thus decreasing `3i` by 3.
+    - Discharging the first three debits in the queue restores the debt invariant.
+
   Every tail that doesn’t cause a rotation dereases ∣f∣ by 1, so decreases 2∣f∣−|r| by 2. It also
   decreases the the index of the remaining nodes by 1, so decreases 3i by 3. Discharging the first
   three debits in the queue restores the debt invariant.
 
-  Now for a snoc that causes a rotation. Just before the rotation, the invariant guarantees that
-  all debits in the queue have been discharged, so after the rotation the only undischarged debits
-  are those created by the rotation itself. Suppose ∣∣f∣∣=m and |r|=2m+1 at the time of the
-  rotation.
+  - Rotating `snoc` operations
+    - (f + r)/2 for frontload
 
-  Then we create 2m+1 debits for the reverse and m for the append. The placement of debits is as in
-  the book, which is summarised as follows.
-
-  d(i)D(i)=⎧⎩⎨⎪⎪13m+10i<mi=mi>m={i+13m+1i<mi≥m
-
-  The debit invariant is violated at i=0 (since D(0)=1>0) and at i=m (since D(m)=3m+1>3m).
-  Discharging one debit from the zeroth node restores the invariant.
+  - Rotating `tail` operations
+    - (f + r)/2 for frontload
 -}
 
 {-
@@ -102,9 +112,12 @@ Remember that reverse is monolithic.
 Since all suspensions are evaluated, the cost of 100 snocs followed by 100 tails is the complete
 cost of this sequence of operations. That is, we can pretend that all evaluation is strict.
 
-The only possible difference is in the sum of the lengths of lists that need to be reversed. With
-the invariant |r| ≤ ∣f∣, this cost amounts to 2_0+2_1+⋯+2_5 = 2_6−1 =63. With the invariant
-|r| ≤ 2 * ∣f∣, this cost amounts to 30+31+32+33=40. Thus, we would expect the second invariant to
-exhibit better performance for the execution trace above.
+The only possible difference is in the sum of the lengths of lists that need to be reversed.
+- For invariant `|r| ≤ ∣f∣`
+  - Cost amounts to `2_0 + 2_1 + ... + 2_5 = 2_6 − 1 = 63`
+- For invariant `|r| ≤ 2 * ∣f∣`
+  - Cost amounts to `3_0 + 3_1 + 3_2 + 3_3 = 40`
+- Thus, we would expect the second invariant to exhibit better performance for the execution
+trace above.
 
 -}

@@ -61,4 +61,6 @@ early nodes have 4 logical futures.
 |  f       |    e    |    e     |       g  |
 ============================================
 
+There are three terminal nodes (i.e. out-degree = 0): e, f, and g.
+
 -}
