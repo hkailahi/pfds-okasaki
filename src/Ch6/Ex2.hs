@@ -6,20 +6,15 @@ import Data.Text (replicate)
 
 import Ch5.Queue (Queue (snoc))
 import Ch6.Types.BankersQueue
-  ( pattern BQ
-  , BalanceCondition (needsRebalance)
-  , BankersQueue
-  , BankersQueue' (BankersQueue, front, rear)
+  ( BankersQueue' (front, rear)
   , pattern EmptyBQ
-  , pattern EmptySQ
-  , SubQueue (SubQueue, sqElems, sqSize)
+  , SubQueue (sqElems)
   , TwoF_lte_R
-  , buildBQ
   , prettyBuildBQHistory
   )
 
 newtype LessMovementBQ a = LessMovementBQ
-  { unLessMovementBQ :: (BankersQueue a) }
+  { unLessMovementBQ :: (BankersQueue' TwoF_lte_R a) }
   deriving stock (Show, Eq, Functor, Foldable)
   deriving Queue via (BankersQueue' TwoF_lte_R)
 
@@ -38,8 +33,6 @@ prettyBuildLMBQHistory n =
   where
     dupe :: a -> (a, a)
     dupe a = (a, a)
-    both :: (Bifunctor p) => (a -> b) -> p a a -> p b b
-    both f = bimap f f
     printElems = tshow . sqElems
     prettySides :: [LessMovementBQ Int] -> [Text]
     prettySides = map

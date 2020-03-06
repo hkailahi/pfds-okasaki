@@ -1,6 +1,4 @@
 {-# LANGUAGE AllowAmbiguousTypes   #-}
-{-# LANGUAGE QuantifiedConstraints #-}
-{-# LANGUAGE UndecidableInstances  #-}
 
 module Ch6.Types.BankersQueue where
 
@@ -87,8 +85,6 @@ prettyBuildBQHistory n =
   where
     dupe :: a -> (a, a)
     dupe a = (a, a)
-    both :: (Bifunctor p) => (a -> b) -> p a a -> p b b
-    both f = bimap f f
     printElems = tshow . sqElems
     prettySides :: [BankersQueue Int] -> [Text]
     prettySides = map
@@ -132,14 +128,8 @@ instance (BalanceCondition invariant) => Queue (BankersQueue' invariant) where
 
   -- |Amortized O(1)
   -- Only when front is smaller than rear does the O(r) frontload happen
-  snoc :: (BalanceCondition invariant)
-    => BankersQueue' invariant a
-    -> a
-    -> BankersQueue' invariant a
-  snoc q@(BQ lenF f lenR r) x = frontLoad $ BQ lenF f (lenR + 1) (x:r)
-  -- snoc q@(BQ lenF f lenR r) x
-    -- | needsRebalance @invariant lenF lenR = frontLoad $ BQ lenF f (lenR + 1) (x:r)
-    -- | otherwise                           = q
+  snoc :: BankersQueue' invariant a -> a -> BankersQueue' invariant a
+  snoc (BQ lenF f lenR r) x = frontLoad $ BQ lenF f (lenR + 1) (x:r)
 
   -- |O(1)
   head :: BankersQueue' invariant a -> Either QueueEmpty a
@@ -148,11 +138,6 @@ instance (BalanceCondition invariant) => Queue (BankersQueue' invariant) where
 
   -- |Amortized O(1)
   -- Only when front is smaller than rear does the O(r) frontload happen
-  tail :: forall invariant a. (BalanceCondition invariant)
-   => BankersQueue' invariant a
-   -> Either QueueEmpty (BankersQueue' invariant a)
-  tail q@(BQ lenF (_:xs) lenR r) = Right . frontLoad $ BQ (lenF - 1) xs lenR r
-  -- tail q@(BQ lenF (_:xs) lenR r)
-  --   | needsRebalance @invariant lenF lenR = Right . frontLoad $ BQ (lenF - 1) xs lenR r
-    -- | otherwise                           = Right q
-  tail _                         = Left QueueEmpty
+  tail :: BankersQueue' invariant a -> Either QueueEmpty (BankersQueue' invariant a)
+  tail (BQ lenF (_:xs) lenR r) = Right . frontLoad $ BQ (lenF - 1) xs lenR r
+  tail _                       = Left QueueEmpty
