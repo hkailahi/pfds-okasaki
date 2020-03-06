@@ -9,6 +9,17 @@ import Ch6.Classes.BalanceCondition (TwoF_lte_R)
 import Ch6.Types.BankersQueue
   (BankersQueue' (front, rear), pattern EmptyBQ, SubQueue (sqElems), prettyBuildBQHistory)
 
+---------------------------------------------------------------------------------------------------
+
+-- Exercise:
+-- 1. Change the banker’s queue invariant to 2 * ∣f∣ ≥ |r|. Show that the O(1) amortised bounds
+-- still hold.
+-- 2. Compare the relative performance of the two implementations on a sequence of one hundred
+-- snocs followed by one hundred tails.
+
+
+---------------------------------------------------------------------------------------------------
+
 newtype LessMovementBQ a = LessMovementBQ
   { unLessMovementBQ :: (BankersQueue' TwoF_lte_R a) }
   deriving stock (Show, Eq, Functor, Foldable)
@@ -40,9 +51,9 @@ prettyBuildLMBQHistory n =
     printSides :: [LessMovementBQ Int] -> Text
     printSides = intercalate "\n" . prettySides
 
+---------------------------------------------------------------------------------------------------
+-- Examples
 
-
-----------------
 exBQ :: IO ()
 exBQ = putStrLn $ prettyBuildBQHistory 20
 
@@ -56,12 +67,6 @@ examples = do
   putStrLn "\n\n"
   putStrLn "Invariant: 2 * |f| >= |r|"
   exLMBQ
-
--- Exercise:
--- 1. Change the banker’s queue invariant to 2 * ∣f∣ ≥ |r|. Show that the O(1) amortised bounds still
--- hold.
--- 2. Compare the relative performance of the two implementations on a sequence of one hundred
--- snocs followed by one hundred tails.
 
 {-
 1.)
