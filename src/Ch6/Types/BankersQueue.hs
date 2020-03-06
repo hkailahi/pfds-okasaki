@@ -1,5 +1,3 @@
-{-# LANGUAGE AllowAmbiguousTypes   #-}
-
 module Ch6.Types.BankersQueue where
 
 import BasicPrelude hiding (replicate)
@@ -7,23 +5,7 @@ import Data.Bifunctor (Bifunctor (bimap))
 import Data.Text (replicate)
 
 import Ch5.Queue (Queue (empty, head, isEmpty, snoc, tail), QueueEmpty (QueueEmpty))
-
----------------------------------------------------------------------------------------------------
--- Parematerizing the balance invariant
-
-class BalanceCondition c where
-  needsRebalance :: Int -> Int -> Bool
-
-data F_lte_R
-data TwoF_lte_R
-
-instance BalanceCondition F_lte_R where
-  needsRebalance :: Int -> Int -> Bool
-  needsRebalance lenF lenR = not $ lenF >= lenR
-
-instance BalanceCondition TwoF_lte_R where
-  needsRebalance :: Int -> Int -> Bool
-  needsRebalance lenF lenR = not $ 2 * lenF >= lenR
+import Ch6.Classes.BalanceCondition (BalanceCondition (needsRebalance), F_lte_R)
 
 ---------------------------------------------------------------------------------------------------
 -- Types and Accessors
