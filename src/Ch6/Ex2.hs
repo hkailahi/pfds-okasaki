@@ -23,9 +23,9 @@ buildLMBQHistory :: Int -> [LessMovementBQ Int]
 buildLMBQHistory n = scanl' snoc (LessMovementBQ EmptyBQ) [1..n]
 
 -- |Shitty golf begets shitty drawings
-prettyBuildLMBQHistory :: Int -> IO ()
+prettyBuildLMBQHistory :: Int -> Text
 prettyBuildLMBQHistory n =
-  putStrLn . printSides $ buildLMBQHistory n
+  printSides $ buildLMBQHistory n
   where
     dupe :: a -> (a, a)
     dupe a = (a, a)
@@ -44,10 +44,10 @@ prettyBuildLMBQHistory n =
 
 ----------------
 exBQ :: IO ()
-exBQ = prettyBuildBQHistory 15
+exBQ = putStrLn $ prettyBuildBQHistory 20
 
 exLMBQ :: IO ()
-exLMBQ = prettyBuildLMBQHistory 15
+exLMBQ = putStrLn $ prettyBuildLMBQHistory 20
 
 examples :: IO ()
 examples = do
@@ -91,4 +91,15 @@ examples = do
 
 {-
 2.)
+
+Remember that reverse is monolithic.
+
+Since all suspensions are evaluated, the cost of 100 snocs followed by 100 tails is the complete
+cost of this sequence of operations. That is, we can pretend that all evaluation is strict.
+
+The only possible difference is in the sum of the lengths of lists that need to be reversed. With
+the invariant |r| ≤ ∣f∣, this cost amounts to 2_0+2_1+⋯+2_5 = 2_6−1 =63. With the invariant
+|r| ≤ 2 * ∣f∣, this cost amounts to 30+31+32+33=40. Thus, we would expect the second invariant to
+exhibit better performance for the execution trace above.
+
 -}

@@ -61,9 +61,9 @@ buildBQHistory :: Int -> [BankersQueue Int]
 buildBQHistory n = scanl' snoc EmptyBQ [1..n]
 
 -- |Shitty golf begets shitty drawings
-prettyBuildBQHistory :: Int -> IO ()
+prettyBuildBQHistory :: Int -> Text
 prettyBuildBQHistory n =
-  putStrLn . printSides $ buildBQHistory n
+  printSides $ buildBQHistory n
   where
     dupe :: a -> (a, a)
     dupe a = (a, a)
