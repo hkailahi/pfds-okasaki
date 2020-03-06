@@ -1,3 +1,7 @@
+{-# LANGUAGE AllowAmbiguousTypes   #-}
+{-# LANGUAGE QuantifiedConstraints #-}
+{-# LANGUAGE UndecidableInstances  #-}
+
 module Ch6.Types.BankersQueue where
 
 import BasicPrelude hiding (replicate)
@@ -5,6 +9,23 @@ import Data.Bifunctor (Bifunctor (bimap))
 import Data.Text (replicate)
 
 import Ch5.Queue (Queue (empty, head, isEmpty, snoc, tail), QueueEmpty (QueueEmpty))
+
+---------------------------------------------------------------------------------------------------
+-- Parematerizing the balance invariant
+
+class BalanceCondition c where
+  needsRebalance :: Int -> Int -> Bool
+
+data F_lte_R
+data TwoF_lte_R
+
+instance BalanceCondition F_lte_R where
+  needsRebalance :: Int -> Int -> Bool
+  needsRebalance lenF lenR = not $ lenF >= lenR
+
+instance BalanceCondition TwoF_lte_R where
+  needsRebalance :: Int -> Int -> Bool
+  needsRebalance lenF lenR = not $ 2 * lenF >= lenR
 
 ---------------------------------------------------------------------------------------------------
 -- Types and Accessors
@@ -26,22 +47,23 @@ pattern EmptySQ = SubQueue 0 []
 -- Laws:
 --   - |front| >= |rear|
 --    - Thus front is empty only if rear is also empty
-data BankersQueue a = BankersQueue
+data BankersQueue' invariant a = BankersQueue
   { front :: SubQueue a
   , rear  :: SubQueue a
   } deriving (Show, Eq, Functor, Foldable)
+type BankersQueue a = BankersQueue' F_lte_R a
 
 {-# COMPLETE BQ #-}
 -- |Because I wanted named fields, but actually requiring field names is annoying because in most
 -- cases they're just noise. With explicit exports, I can decide to not export this pattern if I'm
 -- worried about user's of my `BankersQueue` libary misusing it.
-pattern BQ :: Int -> [a] -> Int -> [a] -> BankersQueue a
+pattern BQ :: Int -> [a] -> Int -> [a] -> BankersQueue' inv a
 pattern BQ sizeF front sizeR rear = BankersQueue
   { front = SubQueue sizeF front
   , rear  = SubQueue sizeR rear
   }
 
-pattern EmptyBQ :: BankersQueue a
+pattern EmptyBQ :: BankersQueue' inv a
 pattern EmptyBQ = BankersQueue
   { front = EmptySQ
   , rear  = EmptySQ
@@ -81,46 +103,56 @@ prettyBuildBQHistory n =
 mkBQ :: [a] -> [a] -> BankersQueue a
 mkBQ f r = BQ (length r) r (length f) f
 
+---------------------------------------------------------------------------------------------------
+-- Parameterized "check" function so we can play with invariant
+
 -- |"check" in book
 -- Makes sure front is always larger than rear
-frontLoad :: BankersQueue a -> BankersQueue a
+frontLoad ::
+  forall invariant a. (BalanceCondition invariant) =>
+  BankersQueue' invariant a -> BankersQueue' invariant a
 frontLoad q@(BQ lenF f lenR r)
-  | lenF >= lenR = q
-  | otherwise   = BankersQueue
-    { front = SubQueue { sqSize = lenF + lenR, sqElems = f ++ reverse r }
-    , rear  = EmptySQ
-    }
-  -- -- | lenR <= lenF = q
-  -- | lenF < lenR  = q
-  -- | lenF >= lenR = BankersQueue
-  --   { front = SubQueue { sqSize = lenF + lenR, sqElems = f ++ reverse r }
-  --   , rear  = EmptySQ
-  --   }
+  | needsRebalance @invariant lenF lenR = BankersQueue
+      { front = SubQueue { sqSize = lenF + lenR, sqElems = f ++ reverse r }
+      , rear  = EmptySQ
+      }
+  | otherwise                           = q
 
 ---------------------------------------------------------------------------------------------------
 
-instance Queue BankersQueue where
+instance (BalanceCondition invariant) => Queue (BankersQueue' invariant) where
   -- |O(1)
-  empty :: BankersQueue a
+  empty :: BankersQueue' invariant a
   empty = EmptyBQ
 
   -- |O(1)
-  isEmpty :: BankersQueue a -> Bool
+  isEmpty :: BankersQueue' invariant a -> Bool
   isEmpty (BQ 0 _ _ _) = True  -- ^Not matching on EmptyBQ since either size or lists are unused
   isEmpty _            = False
 
   -- |Amortized O(1)
   -- Only when front is smaller than rear does the O(r) frontload happen
-  snoc :: BankersQueue a -> a -> BankersQueue a
-  snoc (BQ lenF f lenR r) x = frontLoad $ BQ lenF f (lenR + 1) (x:r)
+  snoc :: (BalanceCondition invariant)
+    => BankersQueue' invariant a
+    -> a
+    -> BankersQueue' invariant a
+  snoc q@(BQ lenF f lenR r) x = frontLoad $ BQ lenF f (lenR + 1) (x:r)
+  -- snoc q@(BQ lenF f lenR r) x
+    -- | needsRebalance @invariant lenF lenR = frontLoad $ BQ lenF f (lenR + 1) (x:r)
+    -- | otherwise                           = q
 
   -- |O(1)
-  head :: BankersQueue a -> Either QueueEmpty a
+  head :: BankersQueue' invariant a -> Either QueueEmpty a
   head (BQ _ (x:_) _ _) = Right x
   head _                = Left QueueEmpty
 
   -- |Amortized O(1)
   -- Only when front is smaller than rear does the O(r) frontload happen
-  tail :: BankersQueue a -> Either QueueEmpty (BankersQueue a)
-  tail (BQ lenF (_:xs) lenR r) = Right . frontLoad $ BQ (lenF - 1) xs lenR r
-  tail _                       = Left QueueEmpty
+  tail :: forall invariant a. (BalanceCondition invariant)
+   => BankersQueue' invariant a
+   -> Either QueueEmpty (BankersQueue' invariant a)
+  tail q@(BQ lenF (_:xs) lenR r) = Right . frontLoad $ BQ (lenF - 1) xs lenR r
+  -- tail q@(BQ lenF (_:xs) lenR r)
+  --   | needsRebalance @invariant lenF lenR = Right . frontLoad $ BQ (lenF - 1) xs lenR r
+    -- | otherwise                           = Right q
+  tail _                         = Left QueueEmpty

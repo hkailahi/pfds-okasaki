@@ -1,8 +1,6 @@
 module Ch6.Ex1 where
 
-import BasicPrelude hiding (unlines)
-
-import Prelude (unlines)
+import BasicPrelude
 
 -- Exercise:
 -- Draw an execution trace for the following set of operations. Annotate each node in the trace
