@@ -4,7 +4,10 @@
     exec ghci
 -}
 
+{-# OPTIONS_GHC -fno-warn-name-shadowing #-}
 {-# LANGUAGE NoOverloadedStrings #-}
+
+module Ch6.DebugEx1 where
 
 import BasicPrelude hiding (unlines)
 import Prelude (unlines)

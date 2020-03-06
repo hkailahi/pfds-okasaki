@@ -4,6 +4,7 @@ import BasicPrelude hiding (unlines)
 
 import Prelude (unlines)
 
+-- Exercise:
 -- Draw an execution trace for the following set of operations. Annotate each node in the trace
 -- with the number of logical futures at that node.
 
