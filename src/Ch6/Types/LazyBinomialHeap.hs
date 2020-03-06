@@ -1,4 +1,5 @@
-{-# LANGUAGE QuantifiedConstraints, UndecidableInstances #-}
+{-# LANGUAGE QuantifiedConstraints #-}
+{-# LANGUAGE UndecidableInstances  #-}
 
 module Ch6.Types.LazyBinomialHeap where
 
@@ -6,14 +7,15 @@ import BasicPrelude
 import Data.List.NonEmpty (NonEmpty ((:|)))
 
 import Ch3.Classes.Heap
-  ( Heap (empty, deleteMin, isEmpty, findMin, merge, insert)
-  , HeapEmpty (HeapEmpty)
-  )
+  (Heap (deleteMin, empty, findMin, insert, isEmpty, merge), HeapEmpty (HeapEmpty))
 
 ---------------------------------------------------------------------------------------------------
 
+-- FIXME Be explicit about lazy and strict things w/ annotations. Make this actually different
+-- from regular BinomialHeap
+
 data Tree a =
-  Node Int a [Tree a]
+  Node !Int !a [Tree a]
   deriving (Eq, Show, Functor, Foldable)
 
 rank :: Tree a -> Int
