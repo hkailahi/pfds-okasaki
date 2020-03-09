@@ -20,6 +20,7 @@ extra-source-files:
 description:         Please see the README on GitHub at <https://github.com/githubuser/okasaki#readme>
 
 default-extensions:
+  - BangPatterns
   - ConstraintKinds
   - DataKinds
   - DefaultSignatures
@@ -43,6 +44,7 @@ default-extensions:
   - NoMonomorphismRestriction
   - OverloadedStrings
   - PackageImports
+  - PatternSynonyms
   - PolyKinds
   - QuasiQuotes
   - RankNTypes
@@ -73,10 +75,13 @@ dependencies:
   - basic-prelude
   - bytestring
   - containers
+  - dlist
+  - fin
   - lens
+  - QuickCheck
   - text
   - unordered-containers
-  - QuickCheck
+  - vec
 
 library:
   source-dirs: src
