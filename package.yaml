@@ -20,11 +20,63 @@ extra-source-files:
 description:         Please see the README on GitHub at <https://github.com/githubuser/okasaki#readme>
 
 default-extensions:
-- FlexibleInstances
-- MultiParamTypeClasses
+  - ConstraintKinds
+  - DataKinds
+  - DefaultSignatures
+  - DeriveDataTypeable
+  - DeriveFoldable
+  - DeriveFunctor
+  - DeriveGeneric
+  - DerivingStrategies
+  - DerivingVia
+  - EmptyDataDecls
+  - FlexibleContexts
+  - FlexibleInstances
+  - FunctionalDependencies
+  - GADTs
+  - GeneralizedNewtypeDeriving
+  - InstanceSigs
+  - LambdaCase
+  - MultiParamTypeClasses
+  - NamedFieldPuns
+  - NoImplicitPrelude
+  - NoMonomorphismRestriction
+  - OverloadedStrings
+  - PackageImports
+  - PolyKinds
+  - QuasiQuotes
+  - RankNTypes
+  - RecordWildCards
+  - ScopedTypeVariables
+  - StandaloneDeriving
+  - TemplateHaskell
+  - TupleSections
+  - TypeApplications
+  - TypeFamilies
+  - TypeOperators
+  - ViewPatterns
+
+ghc-options:
+  - -Wall
+  - -Werror
+  - -Wredundant-constraints
+  - -fwarn-tabs
+  - -threaded
+  - -O2
+  - -rtsopts
+  - -with-rtsopts=-N
+  - -with-rtsopts=-T
 
 dependencies:
-- base >= 4.7 && < 5
+  - base
+  - aeson
+  - basic-prelude
+  - bytestring
+  - containers
+  - lens
+  - text
+  - unordered-containers
+  - QuickCheck
 
 library:
   source-dirs: src
@@ -50,3 +102,7 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - okasaki
+    - hspec
+    - hspec-core
+    - hspec-expectations
+    - QuickCheck
