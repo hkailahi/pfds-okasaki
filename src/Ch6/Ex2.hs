@@ -81,10 +81,6 @@ examples = do
       - Can't insert when `D(i) = inv` without rotating (rebalancing/frontloading)
         - So discharge debit built up
 
-  Every `snoc` that doesn’t cause a rotation increases |r| by 1 and decreases 2∣f∣−|r| by 1. This
-  violates the debt invariant by 1 whenever we just previously had D(i)=2∣∣f∣∣−|r|. We can restore
-  the invariant by discharging the first debit in the queue, which decreases the rest by 1.
-
   - Non-rotation `tail` operations
     - Two changes
       - Decrease `f` by 1, thus decreasing `inv` by 2 (aka -(2 * f))
@@ -92,10 +88,6 @@ examples = do
           - So discharge debit built up
       - Decreases the index (`i`) of the remaining nodes by 1, thus decreasing `3i` by 3.
     - Discharging the first three debits in the queue restores the debt invariant.
-
-  Every tail that doesn’t cause a rotation dereases ∣f∣ by 1, so decreases 2∣f∣−|r| by 2. It also
-  decreases the the index of the remaining nodes by 1, so decreases 3i by 3. Discharging the first
-  three debits in the queue restores the debt invariant.
 
   - Rotating `snoc` operations
     - (f + r)/2 for frontload

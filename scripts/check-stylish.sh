@@ -24,7 +24,7 @@ fi
 PATCH_FILE=stylish.patch
 
 echo "Checking style of haskell files"
-find . -name "*.hs" -and -not -path "*/.stack-work/*" -and -not -path "*/.s2n/*" -exec bash -c 'mydiff=$(diff {} <(stylish-haskell {})); if test -n "$mydiff"; then echo "Not stylish: {}" ; fi;' \; | tee $PATCH_FILE
+find . -name "*.hs" ! -name "*BinomialHeap.hs" -and -not -path "*/.stack-work/*" -and -not -path "*/.s2n/*" -exec bash -c 'mydiff=$(diff {} <(stylish-haskell {})); if test -n "$mydiff"; then echo "Not stylish: {}" ; fi;' \; | tee $PATCH_FILE
 
 if [[ -s $PATCH_FILE ]]; then
   exit 1

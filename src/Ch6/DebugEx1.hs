@@ -43,7 +43,7 @@ module Ch6.DebugEx1 where
 -- {-
 -- From https://old.reddit.com/r/haskell/comments/dv0gye/it_turns_out_ghci_is_a_wellfeatured_debugger_too/
 
--- $ stack ghci src/Ch6/Ex1.hs --ghc-options -Wno-type-defaults,-Wno-missing-signatures,-Wno-name-shadowing
+-- $ stack ghci src/Ch6/Debugx1.hs --ghc-options -Wno-type-defaults,-Wno-missing-signatures,-Wno-name-shadowing
 -- -- <name> <expr, ie the fn in this file>
 -- :def debug debug
 -- -- Break on a line num
@@ -55,7 +55,7 @@ module Ch6.DebugEx1 where
 -- :break 35
 -- :break 36
 -- :break 37
--- -- :break 38
+-- :break 38
 -- -- Show breakpoints set
 -- :show breaks
 -- -- Apply that `:debug` (not `debug`) on the 0th breakpoint
@@ -66,7 +66,7 @@ module Ch6.DebugEx1 where
 -- :set stop 4 :debug
 -- :set stop 5 :debug
 -- :set stop 6 :debug
--- :set stop 7 :debug
+-- -- :set stop 7 :debug
 -- -- :set stop 8 :debug
 -- -- Eval, keeping a history
 -- :trace main

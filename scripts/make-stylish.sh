@@ -15,4 +15,4 @@ fi
 scriptdir=$(dirname $0)
 shareddir="$scriptdir"/..
 
-find . -name "*.hs" -and -not -path "*/.stack-work/*" -exec stylish-haskell -c "$shareddir"/.stylish-haskell.yaml -i {} \;
+find . -name "*.hs" ! -name "*BinomialHeap.hs" -and -not -path "*/.stack-work/*" -exec stylish-haskell -c "$shareddir"/.stylish-haskell.yaml -i {} \;
