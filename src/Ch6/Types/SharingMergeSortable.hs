@@ -141,22 +141,22 @@ instance (Ord a) => Sortable SharingMergeSortable a where
 data Empty = Empty
   deriving (Eq, Show)
 
-extract :: (Ord a, Show a) => Int -> SharingMergeSortable a -> Either Empty [a]
+extract :: (Ord a) => Int -> SharingMergeSortable a -> Either Empty [a]
 extract k (SharingMergeSortable size segments)
   | size < k = Left Empty
   | otherwise = Right $ go k segments []
   where
-    go :: (Ord a, Show a) => Int -> [NonEmpty a] -> [a] -> [a]
+    go :: (Ord a) => Int -> [NonEmpty a] -> [a] -> [a]
     go 0 _    acc = reverse acc
     go n segs acc = let (x, rest) = extractOne segs in go (n - 1) rest (x:acc)
 
-    extractOne :: (Ord a, Show a) => [NonEmpty a] -> (a, [NonEmpty a])
+    extractOne :: (Ord a) => [NonEmpty a] -> (a, [NonEmpty a])
     extractOne [] = error "Forbidden by invariant of data structure"
     extractOne (xs@(x :| xs') : yss) = case xs' of
       []        -> extractLoop x [xs] []           yss
       (x':xs'') -> extractLoop x [xs] [x' :| xs''] yss
 
-    extractLoop :: (Ord a, Show a) =>
+    extractLoop :: (Ord a) =>
       a -> [NonEmpty a] -> [NonEmpty a] -> [NonEmpty a] -> (a, [NonEmpty a])
     extractLoop cur _       accCur [] = (cur, accCur)
     extractLoop cur accOrig accCur (xs@(x :| xs') : yss)
