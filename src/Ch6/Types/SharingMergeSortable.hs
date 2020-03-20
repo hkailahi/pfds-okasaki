@@ -36,7 +36,9 @@ instance (Ord a) => Sortable SharingMergeSortable a where
 
   empty = SharingMergeSortable 0 []
 
-  add x (SharingMergeSortable size segments) =
+  add x (SharingMergeSortable size !segments) =
+    -- Strictness annotation here is important so we know when the forcing happens: it has
+    -- to happen in only one layer when we add to or sort something
     SharingMergeSortable (size + 1) (addSegment (x :| []) segments size)
     where
       addSegment :: NonEmpty a -> [NonEmpty a] -> Int -> [NonEmpty a]
@@ -50,7 +52,7 @@ instance (Ord a) => Sortable SharingMergeSortable a where
             -- it is not possible that sizeMod is odd but there is no front segment
             []                -> error "Forbidden by invariant of data structure"
 
-  sort (SharingMergeSortable _ segments) = foldl merge [] $ map NE.toList segments
+  sort (SharingMergeSortable _ segments) = foldl merge [] . map NE.toList $! segments
 
 -- ANALYSIS of SharingMergeSortable
 --
