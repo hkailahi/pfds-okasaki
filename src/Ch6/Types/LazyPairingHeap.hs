@@ -72,7 +72,7 @@ instance Heap LazyPairingHeap where
   insert :: (Ord a) => a -> LazyPairingHeap a -> LazyPairingHeap a
   insert x a = merge (T x E E) a
 
-  -- | O(1)
+  -- | O(log n) amortized
   merge :: (Ord a) => LazyPairingHeap a -> LazyPairingHeap a -> LazyPairingHeap a
   merge a E                     = a
   merge E b                     = b
