@@ -4,7 +4,7 @@ import BasicPrelude hiding (empty, sort)
 import Data.List.NonEmpty (NonEmpty ((:|)))
 import qualified Data.List.NonEmpty as NE
 
-import Ch6.Classes.Sortable (Sortable (empty, add, sort))
+import Ch6.Classes.Sortable (Sortable (add, empty, sort))
 
 -- |Merge two sorted lists into a sorted list.
 merge :: (Ord a) => [a] -> [a] -> [a]
