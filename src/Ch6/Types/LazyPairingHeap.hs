@@ -1,3 +1,5 @@
+{-# LANGUAGE StrictData #-}
+
 module Ch6.Types.LazyPairingHeap where
 
 import BasicPrelude
@@ -7,7 +9,7 @@ import Ch3.Classes.Heap
 
 data PairingHeap a =
     Ee
-  | Tt a [PairingHeap a]
+  | Tt a [PairingHeap a] -- ^ Well formed invariant: [PairingHeap a] cannot hold empty (`Ee`)
   deriving (Show, Eq, Functor, Foldable)
 
 -- |Used on merge for non-lazy pairing heaps
@@ -46,9 +48,12 @@ instance Heap PairingHeap where
 
 -------------------------------------------------------------------------------------------------
 
+-- |Extra Heap field in each node to hold any partnerless children.
+-- If there are no partnerless children (i.e., if the number of children is even), then this
+-- extra field is empty.
 data LazyPairingHeap a =
     E
-  | T a (LazyPairingHeap a) (LazyPairingHeap a)
+  | T a (LazyPairingHeap a) ~(LazyPairingHeap a) -- 1st is "odd field", 2nd is child heap
   deriving (Show, Eq, Functor, Foldable)
 
 -- |Used on merge for lazy pairing heaps
@@ -87,5 +92,5 @@ instance Heap LazyPairingHeap where
 
   -- | O(log n) amortized
   deleteMin :: (Ord a) => LazyPairingHeap a -> Either HeapEmpty (LazyPairingHeap a)
-  deleteMin E         = Left HeapEmpty
-  deleteMin (T _ a m) = Right $ merge a m
+  deleteMin E          = Left HeapEmpty
+  deleteMin (T _ a !m) = Right $ merge a m
