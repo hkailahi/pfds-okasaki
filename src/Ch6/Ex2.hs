@@ -20,7 +20,7 @@ import Ch6.Types.BankersQueue
 ---------------------------------------------------------------------------------------------------
 
 newtype LessMovementBQ a = LessMovementBQ
-  { unLessMovementBQ :: (BankersQueue' TwoF_lte_R a) }
+  { unLessMovementBQ :: BankersQueue' TwoF_lte_R a }
   deriving stock (Show, Eq, Functor, Foldable)
   deriving Queue via (BankersQueue' TwoF_lte_R)
 

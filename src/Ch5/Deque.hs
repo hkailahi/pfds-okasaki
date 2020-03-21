@@ -40,7 +40,6 @@ class Deque f where
 
 -- |Similarly to the BatchedQueue type, we implement BatchedDeque using two lists, of which
 -- either both are empty, the front contains exactly one element, or both are nonempty.
-
 data BatchedDeque a =
     BDZero
   | BDOne a
@@ -70,7 +69,6 @@ data BatchedDeque a =
 -- This could be done with a single traversal with a partial function based cheat or smarter
 -- types, but it's not really essential to the point of the problem. The implementation given
 -- takes time 3 * length of argument where 3 is a global constant, which is what matters.
-
 reverseHalf :: [a] -> ([a], [a])
 reverseHalf xs =
   let (front, back) = splitAt (length xs `div` 2) xs

@@ -17,8 +17,8 @@ data TwoF_lte_R
 
 instance BalanceCondition F_lte_R where
   needsRebalance :: Int -> Int -> Bool
-  needsRebalance lenF lenR = not $ lenF >= lenR
+  needsRebalance lenF lenR = lenF < lenR
 
 instance BalanceCondition TwoF_lte_R where
   needsRebalance :: Int -> Int -> Bool
-  needsRebalance lenF lenR = not $ 2 * lenF >= lenR
+  needsRebalance lenF lenR = 2 * lenF < lenR

@@ -3,7 +3,6 @@ module Ch6.Classes.Sortable where
 import BasicPrelude
 
 -- |Sortable interface from Figure 6.4
-
 class (Ord a) => Sortable f a where
 
   empty :: f a

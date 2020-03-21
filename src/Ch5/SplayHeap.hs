@@ -7,7 +7,6 @@ data HeapEmpty = HeapEmpty
   deriving (Eq, Show)
 
 -- |Heap signature from Figure 3.1
-
 class (Ord a) => Heap f a where
 
   empty :: f a
@@ -33,7 +32,6 @@ class (Ord a) => Heap f a where
 -- The tree is enforced to be a valid binary search tree in the sense that for a tree
 -- Node l x r, every node label in l is <= x and every node label in r is >= x.
 -- I don't have enough type-fu to make the type enforce this.
-
 data Tree a =
     Leaf
   | Node (Tree a) a (Tree a)
@@ -105,7 +103,6 @@ partition _     _              = error "Partial - Non-exhaustive pattern match"
 
 
 instance (Ord a) => Heap Tree a where
-
   -- O(1) worst case
   empty = Leaf
 
