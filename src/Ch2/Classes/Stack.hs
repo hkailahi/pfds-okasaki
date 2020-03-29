@@ -5,7 +5,7 @@ import BasicPrelude hiding ((++))
 data StackEmpty = StackEmpty
   deriving (Show, Eq)
 
-class Stack (s :: * -> *) a where
+class Stack (s :: * -> *) where
   empty   :: s a
   isEmpty :: s a -> Bool
   cons    :: a -> s a -> s a
@@ -14,7 +14,7 @@ class Stack (s :: * -> *) a where
 
 ---------------------------------------------------------------------------------------
 
-instance Stack [] a where
+instance Stack [] where
   empty :: [a]
   empty = []
 

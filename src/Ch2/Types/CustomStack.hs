@@ -2,7 +2,7 @@ module Ch2.Types.CustomStack where
 
 import BasicPrelude hiding ((++))
 
-import Ch2.Classes.Stack (Stack (empty, isEmpty, cons, head, tail), StackEmpty (StackEmpty))
+import Ch2.Classes.Stack (Stack (cons, empty, head, isEmpty, tail), StackEmpty (StackEmpty))
 
 ---------------------------------------------------------------------------------------
 
@@ -11,16 +11,16 @@ data CustomStack a =
   | Cons a (CustomStack a)
   deriving (Show, Eq)
 
-instance Stack CustomStack a where
+instance Stack CustomStack where
   empty :: CustomStack a
-  empty       = Nil
+  empty = Nil
 
   isEmpty :: CustomStack a -> Bool
   isEmpty Nil = True
   isEmpty _   = False
 
   cons :: a -> CustomStack a -> CustomStack a
-  cons        = Cons
+  cons = Cons
 
   head :: CustomStack a -> Either StackEmpty a
   head (Cons x _) = Right x

@@ -2,7 +2,7 @@ module Ch2.Ex2 where
 
 import BasicPrelude
 
-import Ch2.Types.Tree (Tree(E, T))
+import Ch2.Types.Tree (Tree (E, T))
 import Ch2.Types.UnbalancedSet (UnbalancedSet (BST))
 
 -- Exercise 2.2 (Andersson [And91D]) In the worst case, `member` performs approximately `2d` comparisons, where `d`

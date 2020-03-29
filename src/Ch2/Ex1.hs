@@ -10,3 +10,36 @@ module Ch2.Ex1 where
 suffixes :: [a] -> [[a]]
 suffixes []       = [[]]
 suffixes l@(_:xs) = l : suffixes xs
+
+{-
+
+O(n) time:
+0. suffixes [1,2,3,4]
+ - l0 = 1 : 2 : 3 : 4 : []
+ - xs =     2 : 3 : 4 : []
+1. l0 : suffixes [2,3,4]
+ - l1 = 2 : 3 : 4 : []
+ - xs =     3 : 4 : []
+2. l0 : l1 : suffixes [3,4]
+ - l2 = 3 : 4 : []
+ - xs =     4 : []
+3. l0 : l1 : l2 : suffixes [4]
+ - l3 = 4 : []
+ - xs =     []
+4. l0 : l1 : l2 : l3 : suffixes []
+ - l4 = []
+
+O(n) space:
+ Result = [ 1 : 2 : 3 : 4 : []
+          ,     2 : 3 : 4 : []
+          ,         3 : 4 : []
+          ,             4 : []
+          ,                 []
+          ]
+Stored as [ 1 : v
+          ,     2 : v
+          ,         3 : v
+          ,             4 : v
+          ,                 []
+          ]
+-}

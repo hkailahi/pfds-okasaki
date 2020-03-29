@@ -29,7 +29,7 @@ instance Heap PairingHeap where
   empty = Ee
 
   isEmpty Ee = True
-  isEmpty _ = False
+  isEmpty _  = False
 
   insert x h = merge (Tt x []) h
 

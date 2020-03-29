@@ -2,7 +2,7 @@ module Ch2.Types.Tree where
 
 import BasicPrelude hiding (Set, insert)
 import GHC.Generics (Generic)
-import Test.QuickCheck.Arbitrary (Arbitrary(arbitrary))
+import Test.QuickCheck.Arbitrary (Arbitrary (arbitrary))
 
 import Ch2.Classes.Set (Set (empty, insert, member))
 

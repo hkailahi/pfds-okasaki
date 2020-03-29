@@ -1,9 +1,9 @@
 module Ch2.Types.UnbalancedSet where
 
-import BasicPrelude hiding (Set, insert, empty)
+import BasicPrelude hiding (Set, empty, insert)
 import Test.QuickCheck (Arbitrary (arbitrary), Gen, sized)
 
-import Ch2.Classes.Set (Set (insert, member, empty))
+import Ch2.Classes.Set (Set (empty, insert, member))
 import Ch2.Types.Tree (Tree (E, T))
 
 ---------------------------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ instance Ord a => Set UnbalancedSet a where
     | otherwise = x == y
 
 ---------------------------------------------------------------------------------------------------
-    
+
 instance (Arbitrary a, Ord a) => Arbitrary (UnbalancedSet a) where
   arbitrary :: Gen (UnbalancedSet a)
   arbitrary = sized arbUSet
