@@ -31,7 +31,7 @@ instance Heap PairingHeap where
   isEmpty Ee = True
   isEmpty _  = False
 
-  insert x h = merge (Tt x []) h
+  insert x = merge (Tt x [])
 
   merge h Ee = h
   merge Ee h = h
@@ -40,10 +40,10 @@ instance Heap PairingHeap where
        then Tt x (h2 : hs1)
        else Tt y (h1 : hs2)
 
-  findMin Ee       = Left $ HeapEmpty
+  findMin Ee       = Left HeapEmpty
   findMin (Tt x _) = Right x
 
-  deleteMin Ee        = Left $ HeapEmpty
+  deleteMin Ee        = Left HeapEmpty
   deleteMin (Tt _ hs) = Right $ mergePairs hs
 
 -------------------------------------------------------------------------------------------------
@@ -75,7 +75,7 @@ instance Heap LazyPairingHeap where
 
   -- | O(1)
   insert :: (Ord a) => a -> LazyPairingHeap a -> LazyPairingHeap a
-  insert x a = merge (T x E E) a
+  insert x = merge (T x E E)
 
   -- | O(log n) amortized
   merge :: (Ord a) => LazyPairingHeap a -> LazyPairingHeap a -> LazyPairingHeap a

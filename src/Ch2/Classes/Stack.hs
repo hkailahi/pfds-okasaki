@@ -32,7 +32,7 @@ instance Stack [] where
   tail (_:xs) = Right xs
   tail _      = Left StackEmpty
 
-  -- |Concatenates two lists
+-- |Concatenates two lists
 (++) :: [a] -> [a] -> [a]
 (++) [] ys     = ys
 (++) (x:xs) ys = x : (xs ++ ys)

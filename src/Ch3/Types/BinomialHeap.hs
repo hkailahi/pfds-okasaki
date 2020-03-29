@@ -109,5 +109,5 @@ instance (forall a. Ord a) => Heap BinomialHeap where
   deleteMin :: (Ord a) => BinomialHeap a -> Either HeapEmpty (BinomialHeap a)
   deleteMin (BinomialHeap [])     = Left HeapEmpty
   deleteMin (BinomialHeap (x:xs)) =
-    let ((Node _ _ ts1), ts2) = popMinTree $ x :| xs
-    in Right . BinomialHeap $ mrgTrees (reverse ts1) ts2
+    let (Node _ _ ts1, ts2) = popMinTree $ x :| xs
+    in  Right . BinomialHeap $ mrgTrees (reverse ts1) ts2

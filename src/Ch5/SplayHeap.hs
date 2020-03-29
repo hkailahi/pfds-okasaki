@@ -107,8 +107,8 @@ instance (Ord a) => Heap Tree a where
   empty = Leaf
 
   -- O(1) worst case
-  isEmpty Leaf         = True
-  isEmpty (Node _ _ _) = False
+  isEmpty Leaf    = True
+  isEmpty Node {} = False
 
   -- Amortized time O(log n), proof below
   insert x t = let (small, big) = partition x t in Node small x big

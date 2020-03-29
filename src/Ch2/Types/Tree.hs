@@ -38,4 +38,4 @@ buildBST :: (Ord a) => [a] -> Tree a
 buildBST = foldr insert E
 
 instance (Ord a, Arbitrary a) => Arbitrary (Tree a) where
-  arbitrary = arbitrary @[a] >>= pure . buildBST -- NOTE Builds from a list because I'm lazy
+  arbitrary = buildBST <$> arbitrary @[a] -- NOTE Builds from a list because I'm lazy

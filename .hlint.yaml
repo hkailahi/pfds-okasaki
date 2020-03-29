@@ -1,0 +1,17 @@
+- ignore: {name: "Use if"}
+- ignore: {name: "Use camelCase", within: Ch6.Classes.BalanceCondition }
+
+- arguments:
+  - -XTypeApplications
+  # - -XDerivingStrategies
+  # - -XDerivingVia
+  # - -XQuantifiedConstraints
+
+# Add custom hints for this project
+# - error: {name: Use (<>), lhs: a ++ b, rhs: a <> b} # Implemented for Stack exercises
+
+# Functions that BasicPrelude/ClassyPrelude aliases with simpler names:
+- error: {name: Use map, lhs: fmap, rhs: map}
+- error: {name: Use concat, lhs: mconcat, rhs: concat}
+
+- group: {name: use-lens, enabled: true}
