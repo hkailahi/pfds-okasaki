@@ -3,9 +3,6 @@
 
 - arguments:
   - -XTypeApplications
-  # - -XDerivingStrategies
-  # - -XDerivingVia
-  # - -XQuantifiedConstraints
 
 # Add custom hints for this project
 # - error: {name: Use (<>), lhs: a ++ b, rhs: a <> b} # Implemented for Stack exercises
