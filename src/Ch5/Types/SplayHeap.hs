@@ -1,39 +1,15 @@
-module Ch5.SplayHeap where
+module Ch5.Types.SplayHeap where
 
 import BasicPrelude hiding (partition)
 
--- |Exception value representing an empty heap.
-data HeapEmpty = HeapEmpty
-  deriving (Eq, Show)
-
--- |Heap signature from Figure 3.1
-
-class (Ord a) => Heap f a where
-
-  empty :: f a
-  -- ^ An empty heap.
-
-  isEmpty :: f a -> Bool
-  -- ^ True if the heap is empty, False otherwise.
-
-  insert :: a -> f a -> f a
-  -- ^ Add an element to a heap.
-
-  merge :: f a -> f a -> f a
-  -- ^ Combine two heaps into one.
-
-  findMin :: f a -> Either HeapEmpty a
-  -- ^ Yield the minimal element of the heap, or HeapEmpty if heap is empty.
-
-  deleteMin :: f a -> Either HeapEmpty (f a)
-  -- ^ Yield the heap with minimal element removed, or Heap Empty if heap is empty.
+import Ch5.Classes.Heap
+  (Heap (deleteMin, empty, findMin, insert, isEmpty, merge), HeapEmpty (HeapEmpty))
 
 -- |Simple binary tree with labels on branch nodes.
 --
 -- The tree is enforced to be a valid binary search tree in the sense that for a tree
 -- Node l x r, every node label in l is <= x and every node label in r is >= x.
 -- I don't have enough type-fu to make the type enforce this.
-
 data Tree a =
     Leaf
   | Node (Tree a) a (Tree a)
@@ -105,13 +81,12 @@ partition _     _              = error "Partial - Non-exhaustive pattern match"
 
 
 instance (Ord a) => Heap Tree a where
-
   -- O(1) worst case
   empty = Leaf
 
   -- O(1) worst case
-  isEmpty Leaf         = True
-  isEmpty (Node _ _ _) = False
+  isEmpty Leaf    = True
+  isEmpty Node {} = False
 
   -- Amortized time O(log n), proof below
   insert x t = let (small, big) = partition x t in Node small x big

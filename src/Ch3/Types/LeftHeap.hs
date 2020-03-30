@@ -99,6 +99,7 @@ data LeftHeap' prio a =
     E
   | T Int a (LeftHeap' prio a) (LeftHeap' prio a)
   deriving (Show, Eq, Functor, Foldable)
+type role LeftHeap' nominal representational
 type LeftHeap a = LeftHeap' MinPolicy a
 
 ---------------------------------------------------------------------------------------------------
@@ -115,7 +116,7 @@ instance (MergeOrd prio) => Heap (LeftHeap' prio) where
 
   -- |O(log n) insert
   insert :: (Ord a) => a -> LeftHeap' prio a -> LeftHeap' prio a
-  insert x = merge (T 1 x E E)
+  insert x = merge $ T 1 x E E
 
   -- |O(log n) merge
   -- Two leftist heaps can be merged by merging their right spines as you would merge two sorted
@@ -134,11 +135,11 @@ instance (MergeOrd prio) => Heap (LeftHeap' prio) where
       makeT :: a -> LeftHeap' prio a -> LeftHeap' prio a -> LeftHeap' prio a
       makeT e lT rT
         | rank lT >= rank rT = T (rank lT + 1) e lT rT
-        | otherwise        = T (rank rT + 1) e rT lT
+        | otherwise          = T (rank rT + 1) e rT lT
 
   -- |partial, O(1) find min since located at head
   findMin :: LeftHeap' prio a -> Either HeapEmpty a
-  findMin (T _ x _ _) = Right $ x
+  findMin (T _ x _ _) = Right x
   findMin _           = Left HeapEmpty
 
   -- |partial, O(log n) delete min since located at head

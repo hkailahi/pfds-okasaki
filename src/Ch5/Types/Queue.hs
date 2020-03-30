@@ -1,9 +1,10 @@
-module Ch5.Queue where
+module Ch5.Types.Queue where
 
 import BasicPrelude
-
 import Data.List.NonEmpty (NonEmpty ((:|)))
 import qualified Data.List.NonEmpty as NE
+
+import Ch5.Classes.Queue (Queue (empty, head, isEmpty, snoc, tail), QueueEmpty (QueueEmpty))
 
 -- |AMORTIZATION
 --
@@ -75,29 +76,7 @@ import qualified Data.List.NonEmpty as NE
 -- way, by putting the potential function as credit on the root. Despite this apparent
 -- difference in power, according to the text the methods are provably equivalent.
 
--- |QUEUES
-
--- |Exception value representing an empty queue.
-data QueueEmpty = QueueEmpty
-  deriving (Eq, Show)
-
--- |Type of queues from Figure 5.1.
-class Queue f where
-
-  empty :: f a
-  -- ^ An empty queue.
-
-  isEmpty :: f a -> Bool
-  -- ^ True if the queue is empty, False otherwise.
-
-  snoc :: f a -> a -> f a
-  -- ^ Push an element into the rear of the queue.
-
-  head :: f a -> Either QueueEmpty a
-  -- ^ Yield the element at the head of the queue, or QueueEmpty if the queue is empty.
-
-  tail :: f a -> Either QueueEmpty (f a)
-  -- ^ Yield the queue with its head element removed, or QueueEmpty if the queue is empty.
+---------------------------------------------------------------------------------------------------
 
 -- |Implementation of queues as a pair of lists: BQNonEmpty f r represents a queue
 -- containing the elements of f in order, followed by the elements of r in reverse order

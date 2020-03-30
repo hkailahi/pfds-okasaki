@@ -11,13 +11,13 @@ merge :: (Ord a) => [a] -> [a] -> [a]
 merge [] ys = ys
 merge xs [] = xs
 merge xs@(x:xs') ys@(y:ys')
-  | x <= y    = x:(merge xs' ys)
-  | otherwise = y:(merge xs ys')
+  | x <= y    = x : merge xs' ys
+  | otherwise = y : merge xs ys'
 
 mergeNE :: (Ord a) => NonEmpty a -> NonEmpty a -> NonEmpty a
 mergeNE xs@(x :| xs') ys@(y :| ys')
-  | x <= y    = x :| (merge xs' (NE.toList ys))
-  | otherwise = y :| (merge (NE.toList xs) ys')
+  | x <= y    = x :| merge xs' (NE.toList ys)
+  | otherwise = y :| merge (NE.toList xs) ys'
 
 -- splitAtNE n xs splits the nonempty list xs at position n + 1
 splitAtNE :: Int -> NonEmpty a -> (NonEmpty a, [a])

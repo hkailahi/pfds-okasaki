@@ -1,46 +1,16 @@
-module Ch5.Deque where
+module Ch5.Types.Deque where
 
 import BasicPrelude
-
 import Data.List.NonEmpty (NonEmpty ((:|)), (<|))
 import qualified Data.List.NonEmpty as NE
 
+import Ch5.Classes.Deque
+  (Deque (cons, empty, head, init, isEmpty, last, snoc, tail), DequeEmpty (DequeEmpty))
+
 -- |EXERCISE 5.1
-
--- |Exception value representing an empty deque.
-data DequeEmpty = DequeEmpty
-  deriving (Eq, Show)
-
--- |Type of deques from Figure 5.3.
-class Deque f where
-
-  empty :: f a
-  -- ^ An empty deque.
-
-  isEmpty :: f a -> Bool
-  -- ^ True if the deque is empty, False otherwise.
-
-  cons :: a -> f a -> f a
-  -- ^ Insert at head.
-
-  head :: f a -> Either DequeEmpty a
-  -- ^ Yield element at head, or DequeEmpty if deque is empty.
-
-  tail :: f a -> Either DequeEmpty (f a)
-  -- ^ Yield deque with head element removed, or DequeEmpty if deque is empty.
-
-  snoc :: f a -> a -> f a
-  -- ^ Insert at tail.
-
-  last :: f a -> Either DequeEmpty a
-  -- ^ Yield element at tail, or DequeEmpty if deque is empty.
-
-  init :: f a -> Either DequeEmpty (f a)
-  -- ^ Yield deque with tail element removed, or DequeEmpty if deque is empty.
 
 -- |Similarly to the BatchedQueue type, we implement BatchedDeque using two lists, of which
 -- either both are empty, the front contains exactly one element, or both are nonempty.
-
 data BatchedDeque a =
     BDZero
   | BDOne a
@@ -70,7 +40,6 @@ data BatchedDeque a =
 -- This could be done with a single traversal with a partial function based cheat or smarter
 -- types, but it's not really essential to the point of the problem. The implementation given
 -- takes time 3 * length of argument where 3 is a global constant, which is what matters.
-
 reverseHalf :: [a] -> ([a], [a])
 reverseHalf xs =
   let (front, back) = splitAt (length xs `div` 2) xs

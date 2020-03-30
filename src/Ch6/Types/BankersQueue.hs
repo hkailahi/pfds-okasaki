@@ -4,7 +4,7 @@ import BasicPrelude hiding (replicate)
 import Data.Bifunctor (Bifunctor (bimap))
 import Data.Text (replicate)
 
-import Ch5.Queue (Queue (empty, head, isEmpty, snoc, tail), QueueEmpty (QueueEmpty))
+import Ch5.Classes.Queue (Queue (empty, head, isEmpty, snoc, tail), QueueEmpty (QueueEmpty))
 import Ch6.Classes.BalanceCondition (BalanceCondition (needsRebalance), F_lte_R)
 
 ---------------------------------------------------------------------------------------------------
@@ -12,7 +12,7 @@ import Ch6.Classes.BalanceCondition (BalanceCondition (needsRebalance), F_lte_R)
 
 -- |Front + Rear (or Left + right) `SubQueue`s make a `BankersQueue`
 data SubQueue a = SubQueue
-  { sqSize  :: Int
+  { sqSize  :: !Int
   , sqElems :: [a]
   } deriving (Show, Eq, Functor, Foldable)
 
@@ -28,9 +28,10 @@ pattern EmptySQ = SubQueue 0 []
 --   - |front| >= |rear|
 --    - Thus front is empty only if rear is also empty
 data BankersQueue' invariant a = BankersQueue
-  { front :: SubQueue a
-  , rear  :: SubQueue a
+  { front :: !(SubQueue a)
+  , rear  :: !(SubQueue a)
   } deriving (Show, Eq, Functor, Foldable)
+type role BankersQueue' nominal representational
 type BankersQueue a = BankersQueue' F_lte_R a
 
 {-# COMPLETE BQ #-}
