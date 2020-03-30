@@ -4,7 +4,7 @@ import BasicPrelude hiding (replicate)
 import Data.Bifunctor (Bifunctor (bimap))
 import Data.Text (replicate)
 
-import Ch5.Queue (Queue (empty, head, isEmpty, snoc, tail), QueueEmpty (QueueEmpty))
+import Ch5.Classes.Queue (Queue (empty, head, isEmpty, snoc, tail), QueueEmpty (QueueEmpty))
 import Ch6.Classes.BalanceCondition (BalanceCondition (needsRebalance), F_lte_R)
 
 ---------------------------------------------------------------------------------------------------

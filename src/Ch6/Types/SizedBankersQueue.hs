@@ -12,7 +12,7 @@ module Ch6.Types.SizedBankersQueue where
 -- import           "fin" Data.Nat (Nat)
 -- import "vec" Data.Vec.Lazy (Vec (VNil, (:::)))
 
--- import Ch5.Queue (Queue (empty, head, isEmpty, snoc, tail), QueueEmpty (QueueEmpty))
+-- import Ch5.Classes.Queue (Queue (empty, head, isEmpty, snoc, tail), QueueEmpty (QueueEmpty))
 -- import Ch6.Classes.BalanceCondition (BalanceCondition (needsRebalance), F_lte_R)
 
 -- ---------------------------------------------------------------------------------------------------

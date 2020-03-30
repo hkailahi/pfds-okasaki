@@ -4,7 +4,7 @@ import BasicPrelude hiding (replicate)
 import Data.Bifunctor (Bifunctor (bimap))
 import Data.Text (replicate)
 
-import Ch5.Queue (Queue (snoc))
+import Ch5.Classes.Queue (Queue (snoc))
 import Ch6.Classes.BalanceCondition (TwoF_lte_R)
 import Ch6.Types.BankersQueue
   (BankersQueue' (front, rear), pattern EmptyBQ, SubQueue (sqElems), prettyBuildBQHistory)
