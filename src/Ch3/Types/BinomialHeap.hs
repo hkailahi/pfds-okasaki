@@ -84,13 +84,14 @@ instance (forall a. Ord a) => Heap BinomialHeap where
   isEmpty (BinomialHeap []) = True
   isEmpty _                 = False
 
-  -- |Amortized time O(log n)
+  -- |Amortized time O(1), worst case O(log n)
   -- The worst case is insertion into a heap of size n = 2^k — 1, requiring a total of k
   -- links and O(k) = O(log n) time.
   insert :: (Ord a) => a -> BinomialHeap a -> BinomialHeap a
   insert x = BinomialHeap . insTree (Node 0 x []) . unBinomialHeap
 
-  -- |This is up to O(n), this data structure does not make this operation fast
+  -- |Amortized time O(log n), worst case O(log n)
+  -- This data structure does not make this operation fast
   -- To merge two heaps, we step through both lists of trees in increasing order of rank, linking
   -- trees of equal rank as we go. Again, each link corresponds to a carry in binary arithmetic.
   merge :: (Ord a) => BinomialHeap a -> BinomialHeap a -> BinomialHeap a
@@ -103,7 +104,7 @@ instance (forall a. Ord a) => Heap BinomialHeap where
   findMin (BinomialHeap [])     = Left HeapEmpty
   findMin (BinomialHeap (x:xs)) = Right . root . fst . popMinTree $ x :| xs
 
-  -- |Amortized time O(log n)
+  -- |Amortized time O(log n), worst case O(log n)
   -- Calls auxiliary `popMinTree` that finds the tree with the minimum root and removes it from
   -- the list, returning both the tree and the remaining list.
   deleteMin :: (Ord a) => BinomialHeap a -> Either HeapEmpty (BinomialHeap a)
