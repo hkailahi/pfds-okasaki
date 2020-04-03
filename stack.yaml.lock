@@ -3,7 +3,42 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages: []
+packages:
+- completed:
+    hackage: refined-0.4.4@sha256:7dbbb741e397c61dc68a9c1d891b711344f8f1543f099bf012b54360a44a9ca0,2916
+    pantry-tree:
+      size: 788
+      sha256: c103d3ae1233194c92c2843a08636e83ff025d02606345caf28b2324d65850a8
+  original:
+    hackage: refined-0.4.4
+- completed:
+    hackage: prettyprinter-1.3.0@sha256:83336d853f38e72f9213a3051de11dcb3c948eb09903a34f312e4fef00d79f10,5537
+    pantry-tree:
+      size: 2105
+      sha256: 033fd060e1eea501feffcc385a1704613abed265b593c07d058d0e5e4f88096c
+  original:
+    hackage: prettyprinter-1.3.0
+- completed:
+    hackage: data-default-instances-base-0.1.0.1@sha256:985a13d7103e45a65f06f277b735ef025636014f0d29dd6de998bc7628e09be9,509
+    pantry-tree:
+      size: 242
+      sha256: 92969ddf22c5f54123fb2bcfbe5917b59a7e6382473b0306bcd8fb7990d9aa1a
+  original:
+    hackage: data-default-instances-base-0.1.0.1
+- completed:
+    cabal-file:
+      size: 7095
+      sha256: 43ac8832c2755858c697c4374d2567e363876a3d4fa30f716897221adc82ce23
+    name: table-layout
+    version: 0.9.0.0
+    git: git@github.com:muesli4/table-layout.git
+    pantry-tree:
+      size: 2116
+      sha256: cd3a5513f39ae7296842fe27f2320c539c10e497c15d1532d8974c1d23752e32
+    commit: 183b287451ccb52f35b9292cc50d7de81b7b54b5
+  original:
+    git: git@github.com:muesli4/table-layout.git
+    commit: 183b287451ccb52f35b9292cc50d7de81b7b54b5
 snapshots:
 - completed:
     size: 491373
