@@ -31,17 +31,22 @@ buildPQ = foldl' snoc empty
 
 -- |Constructs a queue from parts, performing a computation based on schedule.
 --   * If the schedule is empty, frontload and refill schedule
---   * Otherwise, advance one step through schedule
-mkValid :: [a] -> SL.List a -> [a] -> RealTimeQueue a
-mkValid front rear [] = RealTimeQueue zs SL.Nil zs
-  where
-    zs = rotate front rear []
-mkValid front rear (_ : as) = RealTimeQueue front rear as
+--   * Otherwise, advance one step through schedule, thus evaluating the
+--     single corresponding thunk from the front
+exec :: [a] -> SL.List a -> [a] -> RealTimeQueue a
+exec front rear (_:as) = RealTimeQueue front rear as
+exec front rear []     =
+  let zs = rotate front rear []
+  in  RealTimeQueue zs SL.Nil zs
 
-
--- |Incremental reversal of queue components.
---   * If the schedule is empty, frontload and refill schedule
---   * Otherwise, advance one step through schedule
+-- |Frontloads a queue by incrementally reversing the rear.
+--
+-- "Schedules" a series of thunks that walks the front list while reversing
+-- the rear list by storing in reverse order in the schedule/accumulator. Once
+-- rear is empty, accumulator is appended to head.
+--
+-- Pre-condition:
+--   * Only called (aside from recursively) when |front| = |rear|
 rotate :: [a] -> SL.List a -> [a] -> [a]
 rotate []       (SL.Cons r SL.Nil) acc = r : acc
 rotate (f : fs) (SL.Cons r rs)     acc = f : rotate fs rs (r : acc)
@@ -50,22 +55,27 @@ rotate _ _ _                           = error "Should be SL.NonEmpty but aintno
 ---------------------------------------------------------------------------------------------------
 
 instance Queue RealTimeQueue where
+  -- |Constructs empty queue
   empty :: RealTimeQueue a
   empty = RealTimeQueue [] SL.Nil []
 
+  -- |O(1) check whether queue is empty
   isEmpty :: RealTimeQueue a -> Bool
   isEmpty (RealTimeQueue front _ _) = null front
 
+  -- |O(1) head of front list
   head :: RealTimeQueue a -> Either QueueEmpty a
   head (RealTimeQueue (f:_) _ _) = Right f
   head _                         = Left QueueEmpty
 
+  -- |O(1) tail, frontloading tail of head with rear
   tail :: RealTimeQueue a -> Either QueueEmpty (RealTimeQueue a)
-  tail (RealTimeQueue (_:fs) rear acc) = Right $ mkValid fs rear acc
+  tail (RealTimeQueue (_:fs) rear acc) = Right $ exec fs rear acc
   tail _                               = Left QueueEmpty
 
+  -- |O(1) snoc to rear list
   snoc :: RealTimeQueue a -> a -> RealTimeQueue a
-  snoc (RealTimeQueue front rear acc) x = mkValid front (SL.Cons x rear) acc
+  snoc (RealTimeQueue front rear acc) x = exec front (SL.Cons x rear) acc
 
 ---------------------------------------------------------------------------------------------------
 
@@ -88,7 +98,8 @@ prettyBuildRTQHistory n =
     defCol :: ColSpec
     defCol = column (fixed (n*2)) center dotAlign def
     commands :: [String]
-    commands = zipWith (<>) (replicate n "snoc ") (map show [1..n])
+    commands = ["empty"]
+      <> zipWith (<>) (replicate n "snoc ") (map show [1..(n-1)])
     components :: [RealTimeQueue Int] -> [[String]]
     components qs = map (toListOf each) $ prettySides qs
     printSides :: [RealTimeQueue Int] -> String
@@ -97,6 +108,40 @@ prettyBuildRTQHistory n =
                   unicodeS
                   (titlesH ["Command", "Front", "Rear", "Schedule"])
                   . map rowG . zipWith (:) commands $ components qs
+
+{-
+You can see the pattern:
+  * Every time we frontload, we fill the schedule with the entire queue
+  * Every time we snoc, we remove one from the schedule
+  * Empty schedule is "complete"
+    * On empty schedule, both front and rear are the same size
+    * We are ready to frontload again on next operation
+
+λ> prettyBuildRTQHistory 10
+┌──────────────────────┬──────────────────────┬──────────────────────┬──────────────────────┐
+│       Command        │        Front         │         Rear         │       Schedule       │
+╞══════════════════════╪══════════════════════╪══════════════════════╪══════════════════════╡
+│        empty         │          []          │          []          │          []          │
+├──────────────────────┼──────────────────────┼──────────────────────┼──────────────────────┤
+│        snoc 1        │         [1]          │          []          │         [1]          │
+├──────────────────────┼──────────────────────┼──────────────────────┼──────────────────────┤
+│        snoc 2        │         [1]          │         [2]          │          []          │
+├──────────────────────┼──────────────────────┼──────────────────────┼──────────────────────┤
+│        snoc 3        │       [1,2,3]        │          []          │       [1,2,3]        │
+├──────────────────────┼──────────────────────┼──────────────────────┼──────────────────────┤
+│        snoc 4        │       [1,2,3]        │         [4]          │        [2,3]         │
+├──────────────────────┼──────────────────────┼──────────────────────┼──────────────────────┤
+│        snoc 5        │       [1,2,3]        │        [5,4]         │         [3]          │
+├──────────────────────┼──────────────────────┼──────────────────────┼──────────────────────┤
+│        snoc 6        │       [1,2,3]        │       [6,5,4]        │          []          │
+├──────────────────────┼──────────────────────┼──────────────────────┼──────────────────────┤
+│        snoc 7        │   [1,2,3,4,5,6,7]    │          []          │   [1,2,3,4,5,6,7]    │
+├──────────────────────┼──────────────────────┼──────────────────────┼──────────────────────┤
+│        snoc 8        │   [1,2,3,4,5,6,7]    │         [8]          │    [2,3,4,5,6,7]     │
+├──────────────────────┼──────────────────────┼──────────────────────┼──────────────────────┤
+│        snoc 9        │   [1,2,3,4,5,6,7]    │        [9,8]         │     [3,4,5,6,7]      │
+└──────────────────────┴──────────────────────┴──────────────────────┴──────────────────────┘
+-}
 
 -- TODO
 -- prettyStateRTQHistory :: [RealTimeQueue a -> RealTimeQueue a] -> IO ()
@@ -115,36 +160,3 @@ prettyBuildRTQHistory n =
 --                   (titlesH ["Front", "Rear", "Schedule"])
 --                   $ map (rowG . toListOf each) $ prettySides qs
 
-{-
-You can see the pattern:
-  * Every time we frontload, we fill the schedule with the entire queue
-  * Every time we snoc, we remove one from the schedule
-  * Empty schedule is "complete"
-    * On empty schedule, both front and rear are the same size
-    * We are ready to frontload again on next operation
-
-λ> prettyBuildRTQHistory 10
-┌──────────────────────┬──────────────────────┬──────────────────────┬──────────────────────┐
-│       Command        │        Front         │         Rear         │       Schedule       │
-╞══════════════════════╪══════════════════════╪══════════════════════╪══════════════════════╡
-│        snoc 1        │          []          │          []          │          []          │
-├──────────────────────┼──────────────────────┼──────────────────────┼──────────────────────┤
-│        snoc 2        │         [1]          │          []          │         [1]          │
-├──────────────────────┼──────────────────────┼──────────────────────┼──────────────────────┤
-│        snoc 3        │         [1]          │         [2]          │          []          │
-├──────────────────────┼──────────────────────┼──────────────────────┼──────────────────────┤
-│        snoc 4        │       [1,2,3]        │          []          │       [1,2,3]        │
-├──────────────────────┼──────────────────────┼──────────────────────┼──────────────────────┤
-│        snoc 5        │       [1,2,3]        │         [4]          │        [2,3]         │
-├──────────────────────┼──────────────────────┼──────────────────────┼──────────────────────┤
-│        snoc 6        │       [1,2,3]        │        [5,4]         │         [3]          │
-├──────────────────────┼──────────────────────┼──────────────────────┼──────────────────────┤
-│        snoc 7        │       [1,2,3]        │       [6,5,4]        │          []          │
-├──────────────────────┼──────────────────────┼──────────────────────┼──────────────────────┤
-│        snoc 8        │   [1,2,3,4,5,6,7]    │          []          │   [1,2,3,4,5,6,7]    │
-├──────────────────────┼──────────────────────┼──────────────────────┼──────────────────────┤
-│        snoc 9        │   [1,2,3,4,5,6,7]    │         [8]          │    [2,3,4,5,6,7]     │
-├──────────────────────┼──────────────────────┼──────────────────────┼──────────────────────┤
-│       snoc 10        │   [1,2,3,4,5,6,7]    │        [9,8]         │     [3,4,5,6,7]      │
-└──────────────────────┴──────────────────────┴──────────────────────┴──────────────────────┘
--}
