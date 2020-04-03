@@ -10,6 +10,12 @@ import Text.Layout.Table
 
 import Ch5.Classes.Queue (Queue (empty, head, isEmpty, snoc, tail), QueueEmpty (QueueEmpty))
 
+-- |Prints table of snocs from 1..(n-1)
+demoRTQ :: Int -> IO ()
+demoRTQ = prettyBuildRTQHistory
+
+---------------------------------------------------------------------------------------------------
+
 -- |Variant of banker's queue that for worst-case instead of amortized time operations.
 -- Uses incremental rotations, whereas the orginal used the monolithic `reverse`.
 data RealTimeQueue a =

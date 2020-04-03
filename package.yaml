@@ -83,6 +83,7 @@ dependencies:
   - strict-list
   - table-layout
   - text
+  - time
   - unordered-containers
   - vec
 
