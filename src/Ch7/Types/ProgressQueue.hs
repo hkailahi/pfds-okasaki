@@ -5,18 +5,12 @@ import BasicPrelude
 import Control.Monad.ST.Lazy (ST, runST)
 import Control.Monad.ST.Lazy.Unsafe (unsafeInterleaveST)
 import Data.STRef.Lazy (STRef, newSTRef, readSTRef, writeSTRef)
+import qualified StrictList as SL (List (Cons, Nil))
 
-import Ch5.Queue (Queue (empty, head, isEmpty, snoc, tail), QueueEmpty (QueueEmpty))
+import Ch5.Classes.Queue (Queue (empty, head, isEmpty, snoc, tail), QueueEmpty (QueueEmpty))
 import Ch6.Classes.BalanceCondition (BalanceCondition (needsRebalance), F_lte_R)
 
 -- The following implementation is based on https://www.well-typed.com/blog/2016/01/efficient-queues/
-
----------------------------------------------------------------------------------------------------
-
-data StrictList a =
-    SNil
-  | SCons a !(StrictList a)
-  deriving (Show, Eq, Functor, Foldable)
 
 ---------------------------------------------------------------------------------------------------
 
@@ -44,12 +38,12 @@ data Delay a =
   | Later (Delay a)
   deriving (Show, Eq)
 
-revDelay :: StrictList a -> Delay [a]
+revDelay :: SL.List a -> Delay [a]
 revDelay = go []
   where
-    go :: [a] -> StrictList a -> Delay [a]
-    go acc SNil         = Now acc
-    go acc (SCons x xs) = Later $ go (x:acc) xs
+    go :: [a] -> SL.List a -> Delay [a]
+    go acc SL.Nil         = Now acc
+    go acc (SL.Cons x xs) = Later $ go (x:acc) xs
 
 runDelay :: Delay a -> (a, Progress)
 runDelay = \xs -> runST $ do
@@ -83,15 +77,15 @@ pattern EmptyLSQ = LazySubQueue 0 []
 
 data StrictSubQueue a = StrictSubQueue
   { ssqSize  :: !Int
-  , ssqElems :: !(StrictList a)
+  , ssqElems :: !(SL.List a)
   }
   deriving (Show, Eq, Functor, Foldable)
 
 pattern EmptySSQ :: StrictSubQueue a
-pattern EmptySSQ = StrictSubQueue 0 SNil
+pattern EmptySSQ = StrictSubQueue 0 SL.Nil
 
 -- | Todo some description
--- Read: `ProgressQueue !Int [a] !Int !(StrictList a) !Progress`
+-- Read: `ProgressQueue !Int [a] !Int !(SL.List a) !Progress`
 data ProgressQueue' invariant a = ProgressQueue
   { front    :: !(LazySubQueue a)
   , rear     :: !(StrictSubQueue a)
@@ -102,7 +96,7 @@ type role ProgressQueue' nominal representational
 type ProgressQueue a = ProgressQueue' F_lte_R a
 
 {-# COMPLETE PQ #-}
-pattern PQ :: Int -> [a] -> Int -> StrictList a -> Progress ->  ProgressQueue' inv a
+pattern PQ :: Int -> [a] -> Int -> SL.List a -> Progress ->  ProgressQueue' inv a
 pattern PQ sizeF front sizeR rear prg = ProgressQueue
   { front    = LazySubQueue sizeF front
   , rear     = StrictSubQueue sizeR rear
@@ -131,7 +125,7 @@ progInvariant q@(PQ lenF xs lenR ys _)
   | needsRebalance @invariant lenF lenR  = let (ys', p1) = runDelay $ revDelay ys
                                                xs'       = xs ++ ys'
                                                p2        = forceSpine lenF xs'
-                                           in PQ (lenF + lenR) xs' 0 SNil (par p1 p2)
+                                           in PQ (lenF + lenR) xs' 0 SL.Nil (par p1 p2)
   | otherwise                            = q
 
 instance (BalanceCondition invariant) => Queue (ProgressQueue' invariant) where
@@ -147,7 +141,7 @@ instance (BalanceCondition invariant) => Queue (ProgressQueue' invariant) where
   -- |Amortized O(1)
   -- Only when front is smaller than rear does the O(r) frontload happen
   snoc :: ProgressQueue' invariant a -> a -> ProgressQueue' invariant a
-  snoc (PQ lenF f lenR r prog) x = progInvariant $ PQ lenF f (lenR + 1) (SCons x r) (step prog)
+  snoc (PQ lenF f lenR r prog) x = progInvariant $ PQ lenF f (lenR + 1) (SL.Cons x r) (step prog)
 
   -- |O(1)
   head :: ProgressQueue' invariant a -> Either QueueEmpty a
@@ -156,7 +150,7 @@ instance (BalanceCondition invariant) => Queue (ProgressQueue' invariant) where
 
 --   head (Q3 _ (x:_ ) _ _  _)   = x
 --   tail (Q3 f (_:xs) r ys p)   = inv3 $ Q3 (f-1) xs r ys (step p)
---   snoc (Q3 f xs     r ys p) y = inv3 $ Q3 f xs (r+1) (SCons y ys) (step p)
+--   snoc (Q3 f xs     r ys p) y = inv3 $ Q3 f xs (r+1) (SL.Cons y ys) (step p)
 
   -- |Amortized O(1)
   -- Only when front is smaller than rear does the O(r) frontload happen

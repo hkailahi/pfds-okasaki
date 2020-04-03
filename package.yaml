@@ -80,6 +80,8 @@ dependencies:
   - fin
   - lens
   - QuickCheck
+  - strict-list
+  - table-layout
   - text
   - unordered-containers
   - vec
