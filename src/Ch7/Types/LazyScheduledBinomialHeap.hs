@@ -9,6 +9,8 @@ import Ch3.Classes.Heap
   , HeapEmpty (HeapEmpty)
   )
 
+-- FIXME Ignore all comments, they are leftover from regular BinomialHeap
+
 ---------------------------------------------------------------------------------------------------
 
 -- |Binomial Trees represented as an int-ranked n-ary tree
@@ -39,27 +41,12 @@ exec (Schedule ((One _ : _) : sched))  = Schedule sched
 exec (Schedule ((Zero : job) : sched)) = Schedule $ job : sched
 exec _ = error "blabadkamsdasdk"
 
--- |O(1) Finds the rank of an n-ary tree
--- The rank of a node is defined to be the length of its right spine (i.e., the rightmost path from
--- the node in question to an empty node).
--- rank :: Tree a -> Int
--- rank (Node r _ _) = r
-
--- -- |O(1) Finds the root element of an n-ary tree
--- root :: Tree a -> a
--- root (Node _ x _) = x
-
 -- |Links two binomial trees of rank r to get a binomial tree of rank r + 1.
 -- This is done by making one tree the leftmost child of the other.
 link :: (Ord a) => Tree a -> Tree a -> Tree a
 link t1@(Node x1 c1) t2@(Node x2 c2)
   | x1 <= x2  = Node x1 (t2:c1)
   | otherwise = Node x2 (t1:c2)
--- link :: (Ord a) => Tree a -> Tree a -> Tree a
--- link t1@(Node x1 c1) t2@(Node x2 c2)
---   | x1 <= x2  = Node x1 (t2:c1)
---   | otherwise = Node x2 (t1:c2)
--- link = undefined
 
 insTree :: (Ord a) => Tree a -> [Digit a] -> [Digit a]
 insTree t []          = One t : []
@@ -92,17 +79,14 @@ popMinTree _ = error "lalalalala"
 
 -- ---------------------------------------------------------------------------------------------------
 
--- -- |A binomial heap is a collection of heap-ordered binomial trees in which no two trees have the
--- -- same rank. This collection is represented as a list of trees in increasing order of rank.
--- |Lazy Scheduled Binomial Heap
+-- |A binomial heap is a collection of heap-ordered binomial trees in which no two trees have the
+-- same rank. This collection is represented as a list of trees in increasing order of rank.
+-- This is a lazy scheduled Binomial Heap.
 data LSBH a = LSBH
   { heap :: [Digit a]
   , jobs :: Schedule a
   }
   deriving (Eq, Show, Functor, Foldable)
--- newtype BinomialHeap a = BinomialHeap
---   { unBinomialHeap :: [Tree a] }
---   deriving (Eq, Show, Functor, Foldable)
 
 instance (forall a. Ord a) => Heap LSBH where
   -- |O(1) worst case
