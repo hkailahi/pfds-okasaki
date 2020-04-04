@@ -23,7 +23,7 @@ data RealTimeQueue a =
     [a]          -- ^ front
     (SL.List a)  -- ^ rear
     [a]          -- ^ Schedule/Accumulating parameter: accumulates the partial results of reversing
-                --  rear. It is initially empty.
+                 --  rear. It is initially empty.
   deriving (Eq, Show, Functor, Foldable)
 
 ---------------------------------------------------------------------------------------------------
