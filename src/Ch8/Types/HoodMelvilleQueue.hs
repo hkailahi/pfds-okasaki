@@ -25,8 +25,9 @@ data HoodMelvilleQueue a =
   HM Int [a] (RotationState a) Int [a]
   deriving (Eq, Show, Functor, Foldable)
 
-exec :: RotationState a -> RotationState a
-exec = \case
+-- |exec
+rotateStep :: RotationState a -> RotationState a
+rotateStep = \case
   Reversing ok (x : f) f' (y:r) r' -> Reversing (ok+1) f  (x:f') r (y:r')
   Reversing ok []      f' [y]   r' -> Appending ok     f' (y:r')
   Appending 0  _       r'          -> Done r'
@@ -40,18 +41,20 @@ invalidate = \case
   Appending ok f' r'     -> Appending (ok-1) f' r'
   state                  -> state
 
-exec2 :: HoodMelvilleQueue a -> HoodMelvilleQueue a
-exec2 (HM lenf f state lenr r) = 
-  case exec (exec state) of
+-- |exec2
+rotate :: HoodMelvilleQueue a -> HoodMelvilleQueue a
+rotate (HM lenf f state lenr r) =
+  case rotateStep (rotateStep state) of
     Done newf -> HM lenf newf Idle     lenr r
     newstate  -> HM lenf f    newstate lenr r
 
-check :: HoodMelvilleQueue a -> HoodMelvilleQueue a
-check (HM lenf f state lenr r)
-  | lenr <= lenf = exec2 $ HM lenf f state lenr r
+-- |check
+rebalance :: HoodMelvilleQueue a -> HoodMelvilleQueue a
+rebalance (HM lenf f state lenr r)
+  | lenr <= lenf = rotate $ HM lenf f state lenr r
   | otherwise    =
     let newstate = Reversing 0 f [ ] r [ ]
-    in  exec2 $ HM (lenf+lenr) f newstate 0 []
+    in  rotate $ HM (lenf+lenr) f newstate 0 []
 
 instance Queue HoodMelvilleQueue where
   empty :: HoodMelvilleQueue a
@@ -62,7 +65,7 @@ instance Queue HoodMelvilleQueue where
 
   snoc :: HoodMelvilleQueue a -> a -> HoodMelvilleQueue a
   snoc (HM lenf f state lenr r) x =
-    check $ HM lenf f state (lenr+1) (x : r)
+    rebalance $ HM lenf f state (lenr+1) (x : r)
 
   head :: HoodMelvilleQueue a -> Either QueueEmpty a
   head (HM _ []    _ _ _) = Left QueueEmpty
@@ -71,16 +74,16 @@ instance Queue HoodMelvilleQueue where
   tail :: HoodMelvilleQueue a -> Either QueueEmpty (HoodMelvilleQueue a)
   tail (HM _    []    _     _    _) = Left QueueEmpty
   tail (HM lenf (_:f) state lenr r) = Right $
-    check $ HM (lenf-1) f (invalidate state) lenr r
+    rebalance $ HM (lenf-1) f (invalidate state) lenr r
 
 ---------------------------------------------------------------------------------------------------
 -- Utilities
 
--- |Building up a `ProgressQueue` from a SL.List
+-- |Build up a @HoodMelvilleQueue@ from a list
 buildHMQ :: [a] -> HoodMelvilleQueue a
 buildHMQ = foldl' snoc empty
 
--- |Steps of building up a HoodMelvilleQueue from a generated list 1..n
+-- |Capture steps for building up a @HoodMelvilleQueue@ from a generated list `1..n`
 buildHMQHistory :: Int -> [HoodMelvilleQueue Int]
 buildHMQHistory n = scanl' snoc empty [1..n]
 
@@ -91,7 +94,7 @@ prettyBuildHMQHistory n =
   where
     prettySides :: [HoodMelvilleQueue Int] -> [(String, String, String, String, String)]
     prettySides = map
-      $ \(HM lF front rotState lR rear) -> 
+      $ \(HM lF front rotState lR rear) ->
         ( show lF
         , show front
         , show rotState
