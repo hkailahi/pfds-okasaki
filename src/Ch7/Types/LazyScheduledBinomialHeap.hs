@@ -36,7 +36,7 @@ newtype Schedule a = Schedule
   deriving (Eq, Show, Functor, Foldable)
 
 exec :: Schedule a -> Schedule a
-exec (Schedule [])                   = Schedule []
+exec (Schedule [])                     = Schedule []
 exec (Schedule ((One _ : _) : sched))  = Schedule sched
 exec (Schedule ((Zero : job) : sched)) = Schedule $ job : sched
 exec _ = error "blabadkamsdasdk"

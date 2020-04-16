@@ -7,13 +7,16 @@ import Text.Layout.Table
   (ColSpec, center, column, def, dotAlign, fixed, rowG, tableString, titlesH, unicodeS)
 
 import Ch5.Classes.Queue (Queue (empty, head, isEmpty, snoc, tail), QueueEmpty (QueueEmpty))
-  
+
 ---------------------------------------------------------------------------------------------------
 
 -- Exercise 8.3
 -- Replace the @lenf@ and @lenr@ fields with a single @diff@ field that maintains the difference
 -- between the lengths of @f@ and @r@. @diff@ may be inaccurate during rebuilding, but must be
 -- accurate by the time rebuilding is finished.
+
+-- Answer: https://github.com/rst76/pfds/blob/09348ea4838eadf263e23f08585e4fce6d5fb49f/ch08/ex.8.3.hs
+-- AKA @diff == lenf - lenr@ when rotation state is `Idle`
 
 ---------------------------------------------------------------------------------------------------
 
@@ -31,18 +34,20 @@ data RotationState a =
   deriving (Eq, Show, Functor, Foldable)
 
 -- |`Ch8.HoodMelvilleQueue` with single `Int` field for size diff rather than two size fields
+-- @diff@ may be inaccurate during rebuilding, but must be accurate by the time rebuilding is
+-- finished (AKA rotation state == `Idle`).
 data DiffHMQueue a =
   DHM Int [a] (RotationState a) [a]
   deriving (Eq, Show, Functor, Foldable)
 
 -- |`Ch8.HoodMelvilleQueue.rotateStep` using size diff
-rotateStep :: RotationState a -> RotationState a
-rotateStep = \case
-  Reversing ok (x : f) f' (y:r) r' -> Reversing (ok+1) f  (x:f') r (y:r')
-  Reversing ok []      f' [y]   r' -> Appending ok     f' (y:r')
-  Appending 0  _       r'          -> Done r'
-  Appending ok (x:f')  r'          -> Appending (ok-1) f' (x:r')
-  state                            -> state
+rotateStep :: Int -> RotationState a -> (Int, RotationState a)
+rotateStep diff = \case
+  Reversing ok (x:f) f'    (y:r) r' -> (diff + 2, Reversing (ok + 1) f (x:f') r (y:r'))
+  Reversing ok []    f'    [y]   r' -> (diff + 1, Appending  ok        f'       (y:r'))
+  Appending 0        _           r' -> (diff,     Done r')
+  Appending ok      (x:f')       r' -> (diff,     Appending (ok - 1)   f'       (x:r'))
+  state                             -> (diff,     state)
 
 -- |`Ch8.HoodMelvilleQueue.invalidate` using size diff
 invalidate :: RotationState a -> RotationState a
@@ -55,28 +60,28 @@ invalidate = \case
 -- |`Ch8.HoodMelvilleQueue.rotateTwice` using size diff
 rotateTwice :: DiffHMQueue a -> DiffHMQueue a
 rotateTwice (DHM diff f state r) =
-  case rotateStep $ rotateStep state of
-    Done newf -> DHM lenf newf Idle     lenr r
-    newstate  -> DHM lenf f    newstate lenr r
+  case rotateStep diff state of
+    (newdiff, Done newf) -> DHM newdiff newf Idle     r
+    (newdiff, newstate)  -> DHM newdiff f    newstate r
 
 -- |`Ch8.HoodMelvilleQueue.rebalance` using size diff
 rebalance :: DiffHMQueue a -> DiffHMQueue a
-rebalance (DHM diff f state r)
-  | lenr <= lenf = rotateTwice $ DHM lenf f state lenr r
-  | otherwise    =
-    let newstate = Reversing 0 f [] r []
-    in  rotateTwice $ DHM (lenf+lenr) f newstate 0 []
+rebalance q@(DHM diff f _ r)
+  | diff >= 0 = rotateTwice q
+  | otherwise = rotateTwice $ DHM newdiff f newstate []
+    where (newdiff, newstate) = rotateStep 0 (Reversing 0 f [] r [])
 
 instance Queue DiffHMQueue where
   empty :: DiffHMQueue a
-  empty = DHM 0 [] Idle 0 []
+  empty = DHM 0 [] Idle []
 
   isEmpty :: DiffHMQueue a -> Bool
-  isEmpty (DHM diff _ _ _) = lenf == 0
+  isEmpty (DHM 0 [] Idle []) = True
+  isEmpty _                  = False
 
   snoc :: DiffHMQueue a -> a -> DiffHMQueue a
   snoc (DHM diff f state r) x =
-    rebalance $ DHM lenf f state (lenr+1) (x : r)
+    rebalance $ DHM (diff - 1) f state (x:r)
 
   head :: DiffHMQueue a -> Either QueueEmpty a
   head (DHM _ []    _ _) = Left QueueEmpty
@@ -85,7 +90,7 @@ instance Queue DiffHMQueue where
   tail :: DiffHMQueue a -> Either QueueEmpty (DiffHMQueue a)
   tail (DHM _    []    _     _) = Left QueueEmpty
   tail (DHM diff (_:f) state r) = Right $
-    rebalance $ DHM (lenf-1) f (invalidate state) lenr r
+    rebalance $ DHM (diff - 1) f (invalidate state) r
 
 ---------------------------------------------------------------------------------------------------
 -- Utilities
