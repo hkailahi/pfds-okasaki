@@ -21,11 +21,16 @@ data RotationState a =
   | Done [a]
   deriving (Eq, Show, Functor, Foldable)
 
+-- Similar in many ways to the `RealTimeQueue`. 
+--   * Maintains two lists representing the front and rear of the queue, respectively
+--   * Incrementally rotates elements from the rear list to the front list beginning when the rear
+--     list becomes one longer than the front list.
+-- The differences lie in the details of this incremental rotation.
 data HoodMelvilleQueue a =
   HM Int [a] (RotationState a) Int [a]
   deriving (Eq, Show, Functor, Foldable)
 
--- |exec
+-- |@exec@ in book
 rotateStep :: RotationState a -> RotationState a
 rotateStep = \case
   Reversing ok (x : f) f' (y:r) r' -> Reversing (ok+1) f  (x:f') r (y:r')
@@ -34,6 +39,9 @@ rotateStep = \case
   Appending ok (x:f')  r'          -> Appending (ok-1) f' (x:r')
   state                            -> state
 
+-- |We keep track of the number of valid elements in @f@, and quit copying elements from
+-- @f@ to @r'@ when this number reaches zero. Every call to `tail` during the rotation
+-- decrements the number of valid elements.
 invalidate :: RotationState a -> RotationState a
 invalidate = \case
   Reversing ok f f' r r' -> Reversing (ok-1) f f' r r'
@@ -41,20 +49,31 @@ invalidate = \case
   Appending ok f' r'     -> Appending (ok-1) f' r'
   state                  -> state
 
--- |exec2
-rotate :: HoodMelvilleQueue a -> HoodMelvilleQueue a
-rotate (HM lenf f state lenr r) =
-  case rotateStep (rotateStep state) of
+-- |@exec2@ in book
+-- 
+-- Q: How many calls to exec we must issue per `snoc` and `tail` to guarantee that the rotation
+-- completes before either the next rotation is ready to begin or the working copy of the front
+-- list is exhausted?
+-- 
+-- A: Twice! Assume that @f@ has length @m@ and @r@ has length @m + 1@ at the beginning of a
+-- rotation. Then, the next rotation will begin after any combination of @2m+2@ insertions or
+-- deletions, but the working copy of the front list will be exhausted after just @m@ deletions.
+-- Altogether, the rotation requires at most @2m + 2@ steps to complete. If we call exec twice
+-- per operation, including the operation that begins the rotation, then the rotation will complete
+-- at most @m@ operations after it begins.
+rotateTwice :: HoodMelvilleQueue a -> HoodMelvilleQueue a
+rotateTwice (HM lenf f state lenr r) =
+  case rotateStep $ rotateStep state of
     Done newf -> HM lenf newf Idle     lenr r
     newstate  -> HM lenf f    newstate lenr r
 
--- |check
+-- |@check@ in book
 rebalance :: HoodMelvilleQueue a -> HoodMelvilleQueue a
 rebalance (HM lenf f state lenr r)
-  | lenr <= lenf = rotate $ HM lenf f state lenr r
+  | lenr <= lenf = rotateTwice $ HM lenf f state lenr r
   | otherwise    =
-    let newstate = Reversing 0 f [ ] r [ ]
-    in  rotate $ HM (lenf+lenr) f newstate 0 []
+    let newstate = Reversing 0 f [] r []
+    in  rotateTwice $ HM (lenf+lenr) f newstate 0 []
 
 instance Queue HoodMelvilleQueue where
   empty :: HoodMelvilleQueue a
