@@ -3,6 +3,7 @@
 - [Ch 8 - Lazy Rebuilding](#ch-8---lazy-rebuilding)
   - [Achieving Balance](#achieving-balance)
   - [Batched Rebuilding](#batched-rebuilding)
+    - [Amortization  - Similarites to Banker's Queue](#amortization---similarites-to-bankers-queue)
     - [Red Black Trees](#red-black-trees)
   - [Global Rebuilding](#global-rebuilding)
     - [Eliminating Amortization - Similarites to Real-Time Queue](#eliminating-amortization---similarites-to-real-time-queue)
@@ -16,9 +17,29 @@
 
 ## Batched Rebuilding
 
-Batch rebuilding similar to the amortization strategy of the banker's queue.
+> Provided no update disturbs the balance too drastically, an attractive alternative is to postpone **rebalancing** until after a sequence of updates, and then to rebalance the entire structure, restoring it to perfect balance. We call this approach **batched rebuilding**.
+>
+> **Batched rebuilding** yields good amortized time bounds provided that:
+>
+> (1) the data structure is not rebuilt too often
+> (2) individual updates do not excessively degrade the performance of later operations.
+>
+> More precisely, condition (1) states that, if one hopes to achieve a bound of `O(f(n))` amortized time per operation, and the rebuilding transformation requires `O(g(n))` time, then the rebuilding transformation cannot be executed any more frequently than every `c • g(n)/f(n)` operations, for some constant `c`.
+
+### Amortization  - Similarites to Banker's Queue
+
+Batched rebuilding reminded me of the amortization strategy of the banker's queues. The **banker's queue**, from here on BQ, kept primary copy of queue split between a forward front list and reversed rear list.
+
+BQs keep an invariant `|c * front| > |rear|` for some constant `c`. On each update operation, we move one step closer to the invariants bound until we hit an expensive operation which pays the entire cost of reversing the rear and appending to the front.
+
+Unlike batched rebuilding, only do rebalancing/frontloading (move front to back, rather than reconstructing entire queue from scratch).
+
+We get amortized O(1) queue operations, which includes infrequent expensive O(n) rebalancing based on the invariant.
 
 ### Red Black Trees
+
+In Excercise 8.1, we revisit Red-Black Trees. Before we omitted a `delete` operation, but now we can get it in amortized O(1) time by
+
 
 ## Global Rebuilding
 
