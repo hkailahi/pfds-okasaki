@@ -1,6 +1,6 @@
 module Ch8.Ex1 where
 
-import BasicPrelude hiding (Set, insert, empty, delete)
+import BasicPrelude hiding (Set, delete, empty, insert)
 
 import Ch2.Classes.Set (Set (empty, insert, member))
 -- import Ch3.Ex9
@@ -40,7 +40,7 @@ data BalanceCheck a = BC
 -- Finds first nested red subtree, and perform left or right rotates to move it
 -- upward
 checkUnbalanced :: RBT a -> BalanceCheck a
-checkUnbalanced = \case 
+checkUnbalanced = \case
   -- Left-left violation
   T B (T R (T R a x b) y c) z d -> BC True  (a, b, c, d) (x, y, z)
   -- Left-right violation
@@ -59,7 +59,7 @@ balance :: RBT a -> RBT a
 balance t@(T color _ _ _) = if isUnbalanced bal
   then T R (T B a x b) y (T B c z d)
   else T color a x b
-  where 
+  where
     bal          = checkUnbalanced t
     (a, b, c, d) = subTrees bal
     (x, y, z)    = elems bal
@@ -100,7 +100,7 @@ fromOrdList = buildSet
 -- | T Color (RBT a) a (RBT a)
 toOrdList :: RBT a -> [a]
 toOrdList E = []
-toOrdList (T _ a (p, x) b) = 
+toOrdList (T _ a (p, x) b) =
   toOrdList a ++ [x | p] ++ toOrdList b
 
 rebuild :: (Ord a) => RBT a -> RBT a

@@ -1,6 +1,6 @@
 module Ch8.Ex1DeepCutz where
 
-import BasicPrelude hiding (insert, empty, delete)
+import BasicPrelude hiding (delete, empty, insert)
 
 -- Exercise 8.1
 -- Extend the red-black trees of Section 3.3 with a `delete` function using these ideas. Add a
@@ -13,17 +13,17 @@ import BasicPrelude hiding (insert, empty, delete)
 -- Answer: https://github.com/rst76/pfds/blob/09348ea4838eadf263e23f08585e4fce6d5fb49f/ch08/ex.8.1.hs
 -- which implements variant from Ralf Hinze's of "Constructing Red-Black Trees" paper
 
-data Color = 
-    R 
+data Color =
+    R
   | B
   deriving (Eq, Show)
 
-data Tree a = 
-    E 
+data Tree a =
+    E
   | T [Int] Color (Tree a) (Bool, a) (Tree a)
   deriving (Eq, Show, Foldable)
 
-data Digit a = 
+data Digit a =
     One a (Tree a)
   | Two a (Tree a) a (Tree a)
   deriving (Eq, Show, Foldable)
@@ -44,7 +44,7 @@ balance (T _ B (T _ R (T _ R a x b) y c) z d) = T [] R (T [] B a x b) y (T [] B 
 balance (T _ B (T _ R a x (T _ R b y c)) z d) = T [] R (T [] B a x b) y (T [] B c z d)
 balance (T _ B a x (T _ R (T _ R b y c) z d)) = T [] R (T [] B a x b) y (T [] B c z d)
 balance (T _ B a x (T _ R b y (T _ R c z d))) = T [] R (T [] B a x b) y (T [] B c z d)
-balance t = t
+balance t                                     = t
 
 insert :: Ord a => a -> Tree a -> Tree a
 insert x E = T [0, 1] R E (True, x) E
@@ -59,9 +59,9 @@ insert x s@(T [i, j] _ _ _ _) = T [i, j + 1] B a y b
 insert _ _ = error "ruhroh"
 
 size :: Tree a -> Int
-size E = 0
+size E                  = 0
 size (T [_, j] _ _ _ _) = j
-size _ = error "ruhroh"
+size _                  = error "ruhroh"
 
 -- |From Hinze paper "Constructing Red-Black Trees"
 incr :: Digit a -> [Digit a] -> [Digit a]
@@ -84,7 +84,7 @@ fromOrdList :: [a] -> Tree a
 fromOrdList = foldl link E . foldl add []
 
 toOrdList :: Tree a -> [a]
-toOrdList E = []
+toOrdList E                  = []
 toOrdList (T _ _ a (p, x) b) = toOrdList a ++ [x | p] ++ toOrdList b
 
 rebuild :: Tree a -> Tree a

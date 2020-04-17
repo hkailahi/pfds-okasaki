@@ -1,10 +1,12 @@
-{-# LANGUAGE AllowAmbiguousTypes, UndecidableInstances, QuantifiedConstraints #-}
+{-# LANGUAGE AllowAmbiguousTypes   #-}
+{-# LANGUAGE QuantifiedConstraints #-}
+{-# LANGUAGE UndecidableInstances  #-}
 
 module Demoable where
 
 import BasicPrelude hiding (empty, insert)
-import Data.Functor.Classes (Show1)
 import Control.Lens (each, toListOf)
+import Data.Functor.Classes (Show1)
 import qualified Prelude as P
 import Text.Layout.Table
   (ColSpec, center, column, def, dotAlign, fixed, rowG, tableString, titlesH, unicodeS)

@@ -21,7 +21,7 @@ data RotationState a =
   | Done [a]
   deriving (Eq, Show, Functor, Foldable)
 
--- Similar in many ways to the `RealTimeQueue`. 
+-- Similar in many ways to the `RealTimeQueue`.
 --   * Maintains two lists representing the front and rear of the queue, respectively
 --   * Incrementally rotates elements from the rear list to the front list beginning when the rear
 --     list becomes one longer than the front list.
@@ -50,11 +50,11 @@ invalidate = \case
   state                  -> state
 
 -- |@exec2@ in book
--- 
+--
 -- Q: How many calls to exec we must issue per `snoc` and `tail` to guarantee that the rotation
 -- completes before either the next rotation is ready to begin or the working copy of the front
 -- list is exhausted?
--- 
+--
 -- A: Twice! Assume that @f@ has length @m@ and @r@ has length @m + 1@ at the beginning of a
 -- rotation. Then, the next rotation will begin after any combination of @2m+2@ insertions or
 -- deletions, but the working copy of the front list will be exhausted after just @m@ deletions.

@@ -1,6 +1,6 @@
 module Ch3.Ex9 where
 
-import BasicPrelude hiding (Set, insert, empty, delete)
+import BasicPrelude hiding (Set, delete, empty, insert)
 
 import Ch2.Classes.Set (Set (empty, insert))
 import Ch3.Types.RBT (RedBlackSet)

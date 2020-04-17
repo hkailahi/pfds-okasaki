@@ -69,7 +69,7 @@ rebalance :: DiffHMQueue a -> DiffHMQueue a
 rebalance q@(DHM diff f _ r)
   | diff >= 0 = rotate q
   | otherwise = rotate $ DHM newdiff f newstate []
-    where 
+    where
       -- second rotation
       (newdiff, newstate) = rotateStep 0 (Reversing 0 f [] r [])
 

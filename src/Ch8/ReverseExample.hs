@@ -3,7 +3,7 @@ module Ch8.ReverseExample where
 import BasicPrelude
 
 -- A list that gets incrementally reversed
-data ReverseState a = 
+data ReverseState a =
     Working [a] [a] -- ^A pair of unreversed and reversed parts of a list
   | Done [a]        -- ^A fully reversed list
   deriving (Show, Eq)

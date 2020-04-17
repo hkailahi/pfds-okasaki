@@ -37,7 +37,7 @@ checkUnbalanced B (T R a x (T R b y c)) z d = BC True  (a, b, c, d) (x, y, z)
 checkUnbalanced B a x (T R (T R b y c) z d) = BC True  (a, b, c, d) (x, y, z)
 -- Right-right violation
 checkUnbalanced B a x (T R b y (T R c z d)) = BC True  (a, b, c, d) (x, y, z)
-checkUnbalanced _ _ x _ = BC False (E, E, E, E) (x, x, x)
+checkUnbalanced _ _ x _                     = BC False (E, E, E, E) (x, x, x)
 
 -- |I think of this as a left-to-right sweep collection of subtrees @(a, b, c, d)@ and their elements
 -- @(x, y, z)@ that looks two levels downward for a nested red subtree. If a nested red subtree exists,
@@ -46,7 +46,7 @@ balance :: Color -> RedBlackSet a -> a -> RedBlackSet a -> RedBlackSet a
 balance color lT e rT = if isUnbalanced bal
   then T R (T B a x b) y (T B c z d)
   else T color a x b
-  where 
+  where
     bal          = checkUnbalanced color lT e rT
     (a, b, c, d) = subTrees bal
     (x, y, z)    = elems bal
