@@ -97,7 +97,7 @@ buildSet = foldl' (flip insert) empty -- equiv to foldr insert E . reverse
 fromOrdList :: (Set s a) => [a] -> s a
 fromOrdList = buildSet
 
--- | T Color (RBT a) a (RBT a)
+-- |Omits the elements if it is marked deleted (by @p@)
 toOrdList :: RBT a -> [a]
 toOrdList E = []
 toOrdList (T _ a (p, x) b) =

@@ -9,6 +9,7 @@
     - [Eliminating Amortization - Similarites to Real-Time Queue](#eliminating-amortization---similarites-to-real-time-queue)
   - [Lazy Rebuilding](#lazy-rebuilding)
     - [Hood-Melville Queues](#hood-melville-queues)
+  - [Batched vs Global vs Lazy Rebuilding](#batched-vs-global-vs-lazy-rebuilding)
 
 ## Achieving Balance
 
@@ -35,6 +36,31 @@ BQs keep an invariant `|c * front| > |rear|` for some constant `c`. On each upda
 Unlike batched rebuilding, only do rebalancing/frontloading (move front to back, rather than reconstructing entire queue from scratch).
 
 We get amortized O(1) queue operations, which includes infrequent expensive O(n) rebalancing based on the invariant.
+
+```
+λ> putStrLn $ prettyBuildBQHistory 20
+Front: []				Rear: []
+Front: [1]				Rear: []
+Front: [1]				Rear: [2]
+Front: [1,2,3]				Rear: []
+Front: [1,2,3]				Rear: [4]
+Front: [1,2,3]				Rear: [5,4]
+Front: [1,2,3]				Rear: [6,5,4]
+Front: [1,2,3,4,5,6,7]				Rear: []
+Front: [1,2,3,4,5,6,7]				Rear: [8]
+Front: [1,2,3,4,5,6,7]				Rear: [9,8]
+Front: [1,2,3,4,5,6,7]				Rear: [10,9,8]
+Front: [1,2,3,4,5,6,7]				Rear: [11,10,9,8]
+Front: [1,2,3,4,5,6,7]				Rear: [12,11,10,9,8]
+Front: [1,2,3,4,5,6,7]				Rear: [13,12,11,10,9,8]
+Front: [1,2,3,4,5,6,7]				Rear: [14,13,12,11,10,9,8]
+Front: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]				Rear: []
+Front: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]				Rear: [16]
+Front: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]				Rear: [17,16]
+Front: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]				Rear: [18,17,16]
+Front: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]				Rear: [19,18,17,16]
+Front: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]				Rear: [20,19,18,17,16]
+```
 
 ### Red Black Trees
 
@@ -148,3 +174,11 @@ In essence, we have replaced the complications of explicitly or implicitly corou
 │        snoc 19        │   15    │    [1,2,3,4,5,6,7]    │     Appending 5 [5,4,3,2,1] [6,7,8,9,10,11,12,13,14,15]      │    4    │     [19,18,17,16]     │
 └───────────────────────┴─────────┴───────────────────────┴──────────────────────────────────────────────────────────────┴─────────┴───────────────────────┘
 ```
+
+## Batched vs Global vs Lazy Rebuilding
+
+> **Global rebuilding** has two advantages over **batched rebuilding**: it is suitable for implementing persistent data structures and it yields **worst-case** bounds rather than **amortized** bounds.
+>
+> **Lazy rebuilding** shares the first advantage, but, at least in its simplest form, yields **amortized** bounds. However, if desired, **worst-case** bounds can often be recovered using the **scheduling** techniques.
+>
+> For example, the **real-time queues** in Section 7.2 combine **lazy rebuilding** with scheduling to achieve **worst-case** bounds. In fact, the combination of **lazy rebuilding** and **scheduling** can be viewed as an instance of **global rebuilding** in which the coroutines are reified in a particularly simple way using lazy evaluation.
