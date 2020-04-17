@@ -11,6 +11,14 @@ import Text.Layout.Table
 
 import qualified Ch5.Classes.Queue as Queue (Queue (empty, snoc))
 
+-- FIXME This be WIP, should be able to get free instances for Queue, Set, Dequeue, etc
+-- TODO
+--  * Defunctionalize the commands
+--    * Enables writing demo with nice DSL and attaching custom interpreters (execute actual function on input, showCommand, etc)
+--  * Smarter sizing
+--  * Figure out how to do newlines
+--     * Follow-up: Allow visual reps (ex. pretty printing trees)
+
 data DemoCol = DemoCol
   { _demoColName :: String
   , _demoColSize :: Int
