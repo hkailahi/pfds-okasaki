@@ -57,9 +57,9 @@ invalidate = \case
   Appending ok f' r'     -> Appending (ok-1) f' r'
   state                  -> state
 
--- |`Ch8.HoodMelvilleQueue.rotateTwice` using size diff
-rotateTwice :: DiffHMQueue a -> DiffHMQueue a
-rotateTwice (DHM diff f state r) =
+-- |Variation of `Ch8.HoodMelvilleQueue.rotateTwice` but only once, and uses size diff
+rotate :: DiffHMQueue a -> DiffHMQueue a
+rotate (DHM diff f state r) =
   case rotateStep diff state of
     (newdiff, Done newf) -> DHM newdiff newf Idle     r
     (newdiff, newstate)  -> DHM newdiff f    newstate r
@@ -67,9 +67,11 @@ rotateTwice (DHM diff f state r) =
 -- |`Ch8.HoodMelvilleQueue.rebalance` using size diff
 rebalance :: DiffHMQueue a -> DiffHMQueue a
 rebalance q@(DHM diff f _ r)
-  | diff >= 0 = rotateTwice q
-  | otherwise = rotateTwice $ DHM newdiff f newstate []
-    where (newdiff, newstate) = rotateStep 0 (Reversing 0 f [] r [])
+  | diff >= 0 = rotate q
+  | otherwise = rotate $ DHM newdiff f newstate []
+    where 
+      -- second rotation
+      (newdiff, newstate) = rotateStep 0 (Reversing 0 f [] r [])
 
 instance Queue DiffHMQueue where
   empty :: DiffHMQueue a
