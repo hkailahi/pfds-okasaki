@@ -61,6 +61,8 @@ invalidate = \case
 -- Altogether, the rotation requires at most @2m + 2@ steps to complete. If we call exec twice
 -- per operation, including the operation that begins the rotation, then the rotation will complete
 -- at most @m@ operations after it begins.
+--
+-- Rotation reverses two list in parallel (m steps), then appending reverse front on to @m@.
 rotateTwice :: HoodMelvilleQueue a -> HoodMelvilleQueue a
 rotateTwice (HM lenf f state lenr r) =
   case rotateStep $ rotateStep state of
