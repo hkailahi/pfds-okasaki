@@ -15,27 +15,12 @@ object Chapter8 {
         run[HMDiffQueue]
     }
 
-    def run[Q[_]](implicit Q: Queue[Q]): Unit = {
-        println(s"\n${Q}\n")
+    def run[Q[_]: Queue]: Unit = {
+        import Queue._
 
-        implicit class QOps[T](q: Q[T]) {
-            def snoc(x: T): Q[T] = {
-                println(s"snoc(${x})")
-                val q0 = Q.snoc(q, x)
-                println(Q.repr(q0))
-                println()
-                q0
-            }
-            def tail: Q[T] = {
-                println("tail")
-                val q0 = Q.tail(q)
-                println(Q.repr(q0))
-                println()
-                q0
-            }
-        }
+        val q0 = empty[Q, Int]
+        println(s"\n${q0.getClass.getName}\n")
 
-        val q0 = Q.empty[Int]
 
         // append 0 .. 6:
         val q6 = (0 until 7).foldLeft(q0) { (q, x) => q.snoc(x) }
@@ -54,6 +39,7 @@ object DumbImplicits {
     }
 }
 
+/** Typeclass for Queue implementations. */
 trait Queue[Q[_]] {
     def empty[T]: Q[T]
     def isEmpty[T](queue: Q[T]): Boolean
@@ -61,24 +47,54 @@ trait Queue[Q[_]] {
     def head[T](queue: Q[T]): T
     def tail[T](queue: Q[T]): Q[T]
 
+    /** Print the queue, showing it's internal structure. */
     def repr[T](queue: Q[T]): String
 }
+object Queue {
+    def empty[Q[_], T](implicit Q: Queue[Q]): Q[T] = Q.empty
 
+    /** Postfix/infix syntax for Queue, which also does some tracing. */
+    implicit class QueueOps[Q[_], T](q: Q[T])(implicit Q: Queue[Q]) {
+        def isEmpty[T]: Boolean = Q.isEmpty(q)
+        def snoc(x: T): Q[T] = {
+            println(s"snoc(${x})")
+            val q0 = Q.snoc(q, x)
+            println(Q.repr(q0))
+            println()
+            q0
+        }
+        def head: T = Q.head(q)
+        def tail: Q[T] = {
+            println("tail")
+            val q0 = Q.tail(q)
+            println(Q.repr(q0))
+            println()
+            q0
+        }
+    }
+}
 
 sealed trait RotationState[T] {
     import RotationState._
 
     @SuppressWarnings(Array("org.wartremover.warts.Throw", "org.wartremover.warts.ToString"))
-    def exec: RotationState[T] = this match {
-        case s@Idle() => s
+    def exec: RotationState[T] = execWithDiff._1
 
-        case Reversing(ok, x :: f, fp, y :: r,   rp) => Reversing(ok+1, f, x :: fp, r, y :: rp)
-        case Reversing(ok, Nil,    fp, y :: Nil, rp) => Appending(ok, fp, y :: rp)
+    /** Run one step, returning the new state and count of elements added to what will be
+      * the new f and removed from the new r.
+      * Note: that number turns out to 0 if the new state is Idle/Done, and 2 otherwise.
+      */
+    @SuppressWarnings(Array("org.wartremover.warts.Throw", "org.wartremover.warts.ToString"))
+    def execWithDiff: (RotationState[T], Int) = this match {
+        case s@Idle() => (s, 0)
 
-        case Appending(0, _, rp)      => Done(rp)
-        case Appending(ok, x :: fp, rp) => Appending(ok-1, fp, x :: rp)
+        case Reversing(ok, x :: f, fp, y :: r,   rp) => (Reversing(ok+1, f, x :: fp, r, y :: rp), 2)  // moving y from r to (future) f
+        case Reversing(ok, Nil,    fp, y :: Nil, rp) => (Appending(ok, fp, y :: rp), 2)  // moving y from r to (future) f
 
-        case s@Done(_) => s
+        case Appending(0, _, rp)        => (Done(rp), 0)
+        case Appending(ok, x :: fp, rp) => (Appending(ok-1, fp, x :: rp), 0)
+
+        case s@Done(_) => (s, 0)
 
         case other => throw new Exception("unexpected: " + other.toString)
     }
@@ -197,7 +213,7 @@ object HMDiffQueue {
     @SuppressWarnings(Array("org.wartremover.warts.Equal", "org.wartremover.warts.ToString"))
     implicit val HMDiffQueueQueue: Queue[HMDiffQueue] = new Queue[HMDiffQueue] {
         def empty[T]: HMDiffQueue[T] = HMDiffQueue(0, Nil, Idle(), Nil)
-        def isEmpty[T](queue: HMDiffQueue[T]): Boolean = queue.diff === 0 && queue.f === Nil
+        def isEmpty[T](queue: HMDiffQueue[T]): Boolean = queue.f === Nil
 
         def snoc[T](q: bookclub.HMDiffQueue[T], x: T): HMDiffQueue[T] =
             check(HMDiffQueue(q.diff-1, q.f, q.state, x :: q.r))
@@ -218,19 +234,20 @@ object HMDiffQueue {
 
         def exec2[T](q: HMDiffQueue[T]): HMDiffQueue[T] = {
             println("  executing: " + q.repr)
-            val (newf, newstate) = q.state.exec.exec match {
-                case Done(newf) => (newf, Idle[T]())    // TODO: get new diff from this state?
-                case s          => (q.f, s)             // diff here is q.diff
+            val (s1, d1) = q.state.execWithDiff
+            val (s2, d2) = s1.execWithDiff
+            println(s"  and again: ${d1}; ${s1}; ${d2}")
+            val (newf, newstate) = s2 match {
+                case Done(newf) => (newf, Idle[T]())
+                case s          => (q.f, s)
             }
-            val newdiff = newf.size - q.r.size  // TODO: not OK!
-            // q.diff = old f size - r.size
-            // need to keep track of number of invalidates?
-            HMDiffQueue(newdiff, newf, newstate, q.r)
+            HMDiffQueue(q.diff + d1 + d2, newf, newstate, q.r)
         }
 
         def check[T](q: HMDiffQueue[T]): HMDiffQueue[T] =
             if (q.diff >= 0) exec2(q)
             else {
+                // Note: q.diff == -1 and state == Idle
                 println("  rotating: " + q.repr)
                 val newstate = RotationState(q.f, q.r)
                 exec2(HMDiffQueue(q.diff, q.f, newstate, Nil))
