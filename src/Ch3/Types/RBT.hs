@@ -64,7 +64,7 @@ instance Ord a => Set RedBlackSet a where
         | x < y     = balance color (ins lT) y rT
         | x > y     = balance color lT       y (ins rT)
         | otherwise = t
-      T _ a v b = ins s -- ^ guaranteed to be nonempty
+      T _ a v b = ins s -- guaranteed to be nonempty
 
   member :: a -> RedBlackSet a -> Bool
   member _ E             = False

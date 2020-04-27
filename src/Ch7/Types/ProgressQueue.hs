@@ -135,7 +135,7 @@ instance (BalanceCondition invariant) => Queue (ProgressQueue' invariant) where
 
   -- |O(1)
   isEmpty :: ProgressQueue' invariant a -> Bool
-  isEmpty (PQ 0 _ _ _ _) = True  -- ^Not matching on EmptyBQ since either size or lists are unused
+  isEmpty (PQ 0 _ _ _ _) = True  -- Not matching on EmptyBQ since either size or lists are unused
   isEmpty _              = False
 
   -- |Amortized O(1)
