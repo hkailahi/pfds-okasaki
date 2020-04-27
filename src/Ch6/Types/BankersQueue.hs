@@ -106,7 +106,7 @@ instance (BalanceCondition invariant) => Queue (BankersQueue' invariant) where
 
   -- |O(1)
   isEmpty :: BankersQueue' invariant a -> Bool
-  isEmpty (BQ 0 _ _ _) = True  -- ^Not matching on EmptyBQ since either size or lists are unused
+  isEmpty (BQ 0 _ _ _) = True  -- Not matching on EmptyBQ since either size or lists are unused
   isEmpty _            = False
 
   -- |Amortized O(1)

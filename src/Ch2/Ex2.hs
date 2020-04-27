@@ -26,8 +26,8 @@ goldMember x t =
   let
     eqX :: Maybe e -> Bool
     eqX = \case
-      Nothing   -> False     -- ^No previous
-      Just prev -> x == prev -- ^*A* previous member, rather than *the* previous member
+      Nothing   -> False      -- No previous
+      Just prev -> x == prev  -- A previous member, rather than *the* previous member
     go :: Tree e -> Maybe e -> Bool
     go E           prev = eqX prev
     go (T lT y rT) prev
