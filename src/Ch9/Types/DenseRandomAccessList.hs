@@ -47,6 +47,29 @@ unconsTree = \ case
     Right (CBLeaf _, _)         -> error "forbidden by invariant of unconsTree"
     Right (CBNode _ t t', ts'') -> Right (t, DDOne t' : ts'')
 
+-- |Common helper for lookup functions. Yields the jth element of the complete binary leaf tree.
+lookupTree :: Integer -> CBLeafTree a -> Either IndexError a
+lookupTree 0 (CBLeaf x)      = Right x
+lookupTree _ (CBLeaf _)      = Left IndexError
+lookupTree j _ | j < 0       = Left IndexError
+lookupTree j (CBNode w t t')
+  | j < w `div` 2            = lookupTree j t
+  | otherwise                = lookupTree (j - w `div` 2) t'
+
+-- |Common helper for update functions. Yields the complete binary leaf tree with the jth element
+-- replaced.
+updateTree :: Integer -> a -> CBLeafTree a -> Either IndexError (CBLeafTree a)
+updateTree 0 y (CBLeaf _)      = Right (CBLeaf y)
+updateTree _ _ (CBLeaf _)      = Left IndexError
+updateTree j _ _ | j < 0       = Left IndexError
+updateTree j y (CBNode w t t')
+  | j < w `div` 2              = do
+      updatedLeft <- updateTree j y t
+      pure $ CBNode w updatedLeft t'
+  | otherwise                  = do
+      updatedRight <- updateTree (j - w `div` 2) y t'
+      pure $ CBNode w t updatedRight
+
 instance RandomAccessList DenseRAList where
 
   empty = DenseRAList []
@@ -82,14 +105,6 @@ instance RandomAccessList DenseRAList where
           | j < size t -> lookupTree j t
           | otherwise  -> lookup' (j - size t) ts'
 
-      lookupTree :: Integer -> CBLeafTree a -> Either IndexError a
-      lookupTree 0 (CBLeaf x)      = Right x
-      lookupTree _ (CBLeaf _)      = Left IndexError
-      lookupTree j _ | j < 0       = Left IndexError
-      lookupTree j (CBNode w t t')
-        | j < w `div` 2            = lookupTree j t
-        | otherwise                = lookupTree (j - w `div` 2) t'
-
   update i x (DenseRAList ts) = DenseRAList <$> update' i x ts
     where
       update' :: Integer -> a -> [DenseRADigit a] -> Either IndexError [DenseRADigit a]
@@ -101,18 +116,6 @@ instance RandomAccessList DenseRAList where
               updatedFirst <- updateTree j y t
               pure $ DDOne updatedFirst : ts'
           | otherwise  -> (DDOne t :) <$> update' (j - size t) y ts'
-
-      updateTree :: Integer -> a -> CBLeafTree a -> Either IndexError (CBLeafTree a)
-      updateTree 0 y (CBLeaf _)      = Right (CBLeaf y)
-      updateTree _ _ (CBLeaf _)      = Left IndexError
-      updateTree j _ _ | j < 0       = Left IndexError
-      updateTree j y (CBNode w t t')
-        | j < w `div` 2              = do
-            updatedLeft <- updateTree j y t
-            pure $ CBNode w updatedLeft t'
-        | otherwise                  = do
-            updatedRight <- updateTree (j - w `div` 2) y t'
-            pure $ CBNode w t updatedRight
 
 -- |EXERCISE 9.1
 
