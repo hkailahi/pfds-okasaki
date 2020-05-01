@@ -3,7 +3,7 @@ module Ch9.Ex1 where
 import BasicPrelude hiding (tail)
 
 import Ch9.Classes.RandomAccessList
--- import Ch9.Types.DenseRandomAccessList
+import qualified Ch9.Types.DenseRandomAccessList as DRAL
 
 -- Exercise 9.1
 -- Write a function drop of type `Int -> RList a -> RList a` that deletes the first k elements of
@@ -18,14 +18,5 @@ naiveDropK n ral =
 -- λ> naiveDropK @SparseRAList 3 $ demoCons 10
 -- SparseRAList [CBLeaf '!',CBNode 2 (CBLeaf '!') (CBLeaf '!'),CBNode 4 (CBNode 2 (CBLeaf '!') (CBLeaf '!')) (CBNode 2 (CBLeaf '!') (CBLeaf '!'))]
 
--- TODO it
--- dropK :: Int -> DenseRAList a -> [DenseRADigit a]
--- dropK 0 (DenseRAList ral)  = ral
--- dropK _ (DenseRAList [])   = []
--- dropK k (DenseRAList x:xs) = case x of
---   DDZero  -> x : dropK k xs
---   DDOne t -> case t of
---     CBLeaf a          -> [DDZero]
---     CBNode size lT rT
---       | size < k
---       | size > k
+drop :: Integer -> DRAL.DenseRAList a -> Either IndexError (DRAL.DenseRAList a)
+drop = DRAL.drop
