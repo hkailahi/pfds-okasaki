@@ -3,6 +3,7 @@ module Ch9.Ex2 where
 import BasicPrelude hiding (empty)
 
 import Ch9.Classes.RandomAccessList
+import qualified Ch9.Types.DenseRandomAccessList as DRAL
 
 -- Exercise 9.2
 -- Write a function create of type `Int -> a -> RList a` that creates a binary random-access list
@@ -36,3 +37,6 @@ ZerolessRAList
  , I (Nd 8 (Nd 4 (Nd 2 Lf! Lf!) (Nd 2 Lf! Lf!)) (Nd 4 (Nd 2 Lf! Lf!) (Nd 2 Lf! Lf!)))
  ]
 -}
+
+insertN :: Integer -> a -> DRAL.DenseRAList a
+insertN = DRAL.repeat

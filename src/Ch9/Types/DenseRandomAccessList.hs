@@ -145,7 +145,7 @@ drop i (DenseRAList ts) = DenseRAList <$> drop' i ts
     repeatZero s acc
       | s == 1    = reverse acc
       | otherwise = repeatZero (s `div` 2) (DDZero : acc)
-    
+
     -- dropTree j t, where 0 <= j < 2^k = size t, returns a list of k + 1 DenseRADigit
     -- representing orders 2^0 through 2^k, and containing the last 2^k - j elements of t.
     -- This list is returned in reverse order.
