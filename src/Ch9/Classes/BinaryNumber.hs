@@ -9,7 +9,7 @@ class BinaryNumber a where
 
   zero :: a
   -- ^ Local representation of zero.
-  
+
   inc :: a -> a
   -- ^ Increment a number by one.
 
