@@ -1,4 +1,4 @@
-{-# LANGUAGE StandaloneDeriving, UndecidableInstances #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Ch10.Types.CatList where
 
