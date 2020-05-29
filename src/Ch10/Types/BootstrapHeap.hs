@@ -20,6 +20,9 @@ deriving instance (Eq a, Eq (h (BootstrapHeap h a))) => Eq (BootstrapHeap h a)
 -- instance Ord a => Ord (BootstrapHeap h a) where
 --   (H x _) < (H y _) = (x < y)
 
+unit :: (Heap h (BootstrapHeap h a)) => a -> BootstrapHeap h a
+unit x = H x empty
+
 instance (Heap h (BootstrapHeap h a), Ord a)
   => Heap (BootstrapHeap h) a where
   empty :: BootstrapHeap h a
@@ -32,7 +35,7 @@ instance (Heap h (BootstrapHeap h a), Ord a)
 
   -- |O(1) worst case
   insert :: a -> BootstrapHeap h a -> BootstrapHeap h a
-  insert x h = merge (H x empty) h
+  insert x h = merge (unit x) h
 
   -- |O(1) worst case (down from O(log n) worst case)
   merge :: BootstrapHeap h a -> BootstrapHeap h a -> BootstrapHeap h a
