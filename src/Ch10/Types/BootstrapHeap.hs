@@ -9,13 +9,13 @@ import Ch5.Classes.Heap
 data BootstrapHeap h a =
     E
   | H a (h (BootstrapHeap h a))
--- deriving instance (Show a, Show (h (BootstrapHeap h a))) => Show (BootstrapHeap h a)
--- deriving instance (Eq a, Eq (h (BootstrapHeap h a))) => Eq (BootstrapHeap h a)
+deriving instance (Show a, Show (h (BootstrapHeap h a))) => Show (BootstrapHeap h a)
+deriving instance (Eq a, Eq (h (BootstrapHeap h a))) => Eq (BootstrapHeap h a)
 
-instance Eq a => Eq (BootstrapHeap h a) where
-  (H x _) == (H y _) = (x == y)
-  E == E             = True
-  _ == _             = False
+-- instance Eq a => Eq (BootstrapHeap h a) where
+--   (H x _) == (H y _) = (x == y)
+--   E == E             = True
+--   _ == _             = False
 
 -- instance Ord a => Ord (BootstrapHeap h a) where
 --   (H x _) < (H y _) = (x < y)
