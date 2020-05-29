@@ -25,3 +25,17 @@ class Queue f where
 
   tail :: f a -> Either QueueEmpty (f a)
   -- ^ Yield the queue with its head element removed, or QueueEmpty if the queue is empty.
+
+instance Queue [] where
+  empty = []
+  isEmpty = \case
+    [] -> True
+    _    -> False
+
+  snoc xs e = xs <> [e]
+
+  head []      = Left QueueEmpty
+  head (x : _) = Right x
+
+  tail []       = Left QueueEmpty
+  tail (_ : xs) = Right xs
