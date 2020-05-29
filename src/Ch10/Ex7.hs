@@ -60,26 +60,31 @@ removeMinTree (t : ts)
   where (t', ts') = removeMinTree ts
 
 instance (Ord a) => Heap BootstrapBinomialHeap a where
-
+  empty :: BootstrapBinomialHeap a
   empty = E
 
+  isEmpty :: BootstrapBinomialHeap a
   isEmpty E = True
   isEmpty _ = False
 
+  insert :: a -> BootstrapBinomialHeap a -> BootstrapBinomialHeap a
   insert x E = NE x []
   insert x (NE y ts)
     | x <= y    = NE x (insTree (tree y) ts)
     | otherwise = NE y (insTree (tree x) ts)
 
+  merge :: a -> BootstrapBinomialHeap a -> BootstrapBinomialHeap a
   merge E h = h
   merge h E = h
   merge (NE x ts1) (NE y ts2)
     | x <= y    = NE x (insTree (tree y) (mrg ts1 ts2))
     | otherwise = NE y (insTree (tree x) (mrg ts1 ts2))
 
+  findMin :: BootstrapBinomialHeap a -> a
   findMin E = Left HeapEmpty
   findMin (NE x _) = Right x
 
+  deleteMin :: BootstrapBinomialHeap a -> BootstrapBinomialHeap a
   deleteMin E = Left HeapEmpty
   deleteMin (NE _ ts) = Right $ NE x (mrg (reverse ts1) ts2)
     where (Node _ (NE x []) ts1, ts2) = removeMinTree ts
