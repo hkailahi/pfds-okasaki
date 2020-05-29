@@ -6,6 +6,12 @@ import Ch5.Classes.Queue (QueueEmpty (..), Queue (..))
 
 -- |Data type for queues which represent their front as a front list and a queue of
 -- future lists having been reversed from the rear, awaiting promotion to be the new front.
+-- NB. This does the thing you're not supposed to do where you have a raw record type
+-- wrapped in one constructor of an algebraic data type, and then the accessors for that
+-- record type are partial functions. The functions are not used in the code below --
+-- the record fields are only ever used for pattern matching -- but I shouldn't have
+-- written it this way. What you're supposed to do is put a Detail type as the argument
+-- of the constructor.
 
 data BootstrapQueue a =
     BQEmpty
