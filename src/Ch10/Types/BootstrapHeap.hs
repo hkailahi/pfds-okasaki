@@ -25,13 +25,16 @@ instance (Heap h (BootstrapHeap h a), Ord a)
   empty :: BootstrapHeap h a
   empty = E
 
+  -- |O(1) worst case
   isEmpty :: BootstrapHeap h a -> Bool
   isEmpty E = True
   isEmpty _ = False
 
+  -- |O(1) worst case
   insert :: a -> BootstrapHeap h a -> BootstrapHeap h a
   insert x h = merge (H x empty) h
 
+  -- |O(1) worst case (down from O(log n) worst case)
   merge :: BootstrapHeap h a -> BootstrapHeap h a -> BootstrapHeap h a
   merge E h = h
   merge h E = h
@@ -40,10 +43,12 @@ instance (Heap h (BootstrapHeap h a), Ord a)
       then H x (insert h2 p1)
       else H y (insert h1 p2)
 
+  -- |O(1) worst case (down from O(log n) worst case)
   findMin :: BootstrapHeap h a -> Either HeapEmpty a
   findMin E       = Left HeapEmpty
   findMin (H x _) = Right x
 
+  -- |O(log n) worst case
   deleteMin :: BootstrapHeap h a -> Either HeapEmpty (BootstrapHeap h a)
   deleteMin E = Left HeapEmpty
   deleteMin (H _ p) =
