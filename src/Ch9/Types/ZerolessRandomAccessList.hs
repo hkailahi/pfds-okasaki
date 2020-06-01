@@ -69,7 +69,7 @@ instance RandomAccessList ZerolessRAList where
           | j < size t     -> lookupTree j t
           | j < 2 * size t -> lookupTree (j - size t) t'
           | otherwise      -> lookup' (j - 2 * size t) ts
-      
+
 
   update i x (ZerolessRAList tts) = ZerolessRAList <$> update' i x tts
     where

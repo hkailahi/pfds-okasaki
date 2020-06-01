@@ -22,7 +22,7 @@ instance BinaryNumber ZerolessDenseBinaryNat where
   inc (X : ds) = I : inc ds
 
   -- EXERCISE 9.4. Add implementations of dec and add for this type.
-  
+
   dec []       = Nothing
   dec [I]      = Just []
   dec (X : ds) = Just (I : ds)
