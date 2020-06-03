@@ -8,7 +8,7 @@ import Ch10.Classes.CatenableList
 import Ch5.Classes.Queue (Queue (..))
 import qualified Ch5.Classes.Queue as Q
 
--- |Isomorphic to `Cofree` + `E` (can be an unlabelled empty)
+-- |Isomorphic to `Cofree :+: ()` (can be an unlabelled empty)
 data CatList q a =
     E
   | C a (q (CatList q a))

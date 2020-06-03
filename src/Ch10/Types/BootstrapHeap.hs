@@ -6,6 +6,7 @@ import BasicPrelude hiding (empty, insert)
 
 import Ch5.Classes.Heap
 
+-- `CoFree :+: ()`
 data BootstrapHeap h a =
     E
   | H a (h (BootstrapHeap h a))
