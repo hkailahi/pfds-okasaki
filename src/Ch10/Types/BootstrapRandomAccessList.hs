@@ -100,6 +100,7 @@ data ZerolessPairSeq a =
   | ZOne a (ZerolessPairSeq (a, a))
   | ZTwo a a (ZerolessPairSeq (a, a))
   | ZThree a a a (ZerolessPairSeq (a, a))
+  deriving (Eq, Show)
 
 unconsZ :: ZerolessPairSeq a -> Either Empty (a, ZerolessPairSeq a)
 unconsZ = \ case
