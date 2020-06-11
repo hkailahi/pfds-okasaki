@@ -2,7 +2,7 @@ module Ch10.Types.BootstrapQueue where
 
 import BasicPrelude hiding (empty, head, tail)
 
-import Ch5.Classes.Queue (QueueEmpty (..), Queue (..))
+import Ch5.Classes.Queue (Queue (..), QueueEmpty (..))
 
 -- |Data type for queues which represent their front as a front list and a queue of
 -- future lists having been reversed from the rear, awaiting promotion to be the new front.

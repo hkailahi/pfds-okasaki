@@ -4,12 +4,7 @@ import BasicPrelude hiding (empty)
 
 import Ch9.Classes.RandomAccessList
 import Ch9.Types.DenseRandomAccessList
-  ( CBLeafTree (CBLeaf, CBNode)
-  , link
-  , lookupTree
-  , size
-  , updateTree
-  )
+  (CBLeafTree (CBLeaf, CBNode), link, lookupTree, size, updateTree)
 
 -- |EXERCISE 9.3
 

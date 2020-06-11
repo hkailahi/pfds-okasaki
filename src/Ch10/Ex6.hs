@@ -2,9 +2,9 @@ module Ch10.Ex6 where
 
 import BasicPrelude hiding (empty, (++))
 
-import qualified Ch5.Classes.Queue as Q
 import Ch10.Classes.CatenableList (CatenableList ((++)))
 import Ch10.Types.CatList (CatList)
+import qualified Ch5.Classes.Queue as Q
 
 {-
 Exercise 10.6:

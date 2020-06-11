@@ -8,12 +8,12 @@ import qualified Prelude as P
 import Text.Layout.Table
   (ColSpec, center, column, def, dotAlign, fixed, rowG, tableString, titlesH, unicodeS)
 
+import qualified Ch10.Classes.CatenableList as C (CatenableList (..))
+import Ch10.Types.BootstrapQueue
+import Ch10.Types.BootstrapRandomAccessList
+import Ch10.Types.CatList
 import qualified Ch5.Classes.Queue as Q (Queue (..))
 import Ch9.Classes.RandomAccessList (RandomAccessList (..))
-import Ch10.Types.BootstrapRandomAccessList
-import Ch10.Types.BootstrapQueue
-import qualified Ch10.Classes.CatenableList as C (CatenableList (..))
-import Ch10.Types.CatList
 
 -- |Build up a @PairSeq@ from a list [1..n]
 demoPairSeq :: Int -> IO ()
