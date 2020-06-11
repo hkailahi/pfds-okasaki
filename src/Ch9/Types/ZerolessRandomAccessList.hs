@@ -4,12 +4,7 @@ import BasicPrelude hiding (empty)
 
 import Ch9.Classes.RandomAccessList
 import Ch9.Types.DenseRandomAccessList
-  ( CBLeafTree (CBLeaf, CBNode)
-  , link
-  , lookupTree
-  , size
-  , updateTree
-  )
+  (CBLeafTree (CBLeaf, CBNode), link, lookupTree, size, updateTree)
 
 -- |EXERCISE 9.5
 
@@ -53,8 +48,8 @@ instance RandomAccessList ZerolessRAList where
         [I t]       -> Right (t, [])
         X t t' : ts -> Right (t, I t' : ts)
         I t : ts    -> case unconsTree ts of
-          Left Empty                 -> error "can't have empty ZerolessRAList with digits in it"
-          Right (CBLeaf _, _)        -> error "forbidden by invariant of ZerolessRAList"
+          Left Empty                -> error "can't have empty ZerolessRAList with digits in it"
+          Right (CBLeaf _, _)       -> error "forbidden by invariant of ZerolessRAList"
           Right (CBNode _ u u', us) -> Right (t, X u u' : us)
 
   lookup i (ZerolessRAList tts) = lookup' i tts

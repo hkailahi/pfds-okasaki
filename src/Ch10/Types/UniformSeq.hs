@@ -38,7 +38,7 @@ sizeEP (Elem _)     = 1
 sizeEP (Pair xs ys) = sizeEP xs + sizeEP ys
 
 sizeU :: USeq a -> Int
-sizeU UNil         = 0
+sizeU UNil          = 0
 sizeU (UCons ep xs) = sizeEP ep + sizeU xs
 
 ---------------------------------------------------------------------------------------------------

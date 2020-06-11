@@ -160,7 +160,7 @@ Thus, if we are inserting continuously on one side, rebalances happen when
 
 log n / log((c + 1)/2)
 
-passes an integer, and each rebalance costs c / (c + 1) n. 
+passes an integer, and each rebalance costs c / (c + 1) n.
 
 This means that operations continuously inserting or removing from one side are much more
 expensive with c = 2 than with c = 4, since the difference in frequency is exponential in

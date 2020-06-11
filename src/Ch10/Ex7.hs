@@ -86,7 +86,7 @@ instance (Ord a) => Heap BootstrapBinomialHeap a where
     | otherwise = NE y . insTree (tree x) $ mrg ts1 ts2
 
   findMin :: BootstrapBinomialHeap a -> Either HeapEmpty a
-  findMin E = Left HeapEmpty
+  findMin E        = Left HeapEmpty
   findMin (NE x _) = Right x
 
   deleteMin :: BootstrapBinomialHeap a -> Either HeapEmpty (BootstrapBinomialHeap a)
